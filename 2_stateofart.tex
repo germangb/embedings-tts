@@ -1,0 +1,102 @@
+\chapter{State of the art}
+
+In this section, Deep Learning and neural networks are briefly introduced. In addition to that, both the text-to-speech and sentiment analysis tasks are also introduced and discussed, including the challenges that they present as well as the classical and more modern techniques that tackle them, and how they have influenced the development of this project. By the end of this chapter, the core concepts necessary for the discussion of the work done in this publication will have been introduced to the reader.
+
+\section{Deep Learning}
+
+In recent years, deep structured learning, or more commonly called deep learning is a set of techniques that has risen in popuarity and established itself as a new area of machine learning among the scientific and research communities. \cite{deng2014deep}
+
+\cite{bengio2009learning} discussed the limitations of shallow architectures and provided a theoretical basis to the advantages of deeper ones. But it has only been in recent years that such architectures have been able to be put into production with ever-growing pupularity thanks to compute technologies being every time more available and affordable to consumers.
+
+With deep learning architectures, it is possible to learn complex non-linear representations from large amounts of data. Raw data can be processed and turned into several levels of higher level representations to make it possible to reason about them and make tasks such as classification easier and more effective.
+
+In addition to more compute power, large datasets that can take adavantage of deep models such Imagenet \cite{russakovsky2015imagenet} are being made publicly available. These datasets are often used as benchmarks and serve as points of reference to drive research and development forward.
+
+In summary, one could describe Deep Learning as models capable of obtaining high level information from low level one, and the compute resources and databases that make training of these models possible.
+
+%Deep Learning is a concept that has risen in popularity in recent years among scientists and researchers.
+%It's specially popular in the computer vision and image recognition fields where computational and memory requirements are high.
+%Deep learning is popular thanks to the availability 
+
+\section{Deep Neural Networks}
+
+%TODO needs references!!
+
+In deep learning, a common architecture is the so called deep neural network, which is an artificial neural network with a large number of hidden layers. The desire to decomposing a signal into higher levels of abstraction drives such neural networks configurations, and since more layers require more trainable parameters, large amounts of training data are also needed to train them.
+
+To begin this section, the basic unit of a neural network is introduced to solve a classifiation problem. After that, we see how these basic units can be combined to learn more complex relationships and deal with more generic distributions of data.
+
+\subsection{From the perceptron to neural networks}
+
+\begin{figure}
+    \centering
+    Hello figure
+    \caption{Figure caption goes here!}
+    \label{fig:perceptron}
+\end{figure}
+
+%TODO needs references!!!
+The basic unit of a neural network is the neuron. A neuron is defined by a set of scalar inputs (including a bias constant term), a linear operation of these inputs, and an activation function at the output (Figure \ref{fig:perceptron}). This configuration is also called Perceptron.
+
+The Perceptron is therefore defined by a set of parameters: the weights of the linear operation and the bias term. Equation \ref{eq:perceptron} shows the operation that takes place, where $\mathbf{x}$ is the input vector, $\mathbf{w}$ are the input weights, $b$ is the bias term, $\sigma$ is the diferentiable activation function, often a $sigmoid$ (\ref{eq:sigmoid}) or a $tanh$, and $y$ is the output. For the sake of simplicity, the remainder of this section assumes $\sigma$ to be a sigmoid.
+
+\begin{equation}
+    \mathbf{y} = \sigma(\mathbf{x}^T \cdot \mathbf{w} + b)
+    \label{eq:perceptron}
+\end{equation}
+
+\begin{equation}
+    \sigma (x) = \frac{1}{1 + e^{-x}}
+    \label{eq:sigmoid}
+\end{equation}
+
+Assume a binary classification task, where the inputs yielding an activation above a certain defined threshold belong to one class. The perceptron has an intuitive geometrical interpretation. The weights of the equation ${w_1, w_2, ... w_n}$ and the bias term $b$ represent the rotation translation of the decission boundary that's splits the hyperspace in two regions.
+
+\begin{figure}
+    \center
+    Hello
+    %\includegraphics[width=0.75\textwidth]{figures/neural-network}
+    \caption{Model composed of hierarchicaly stacked neurons (neural network)}
+    \label{fig:stacking}
+\end{figure}
+
+By stacking several of these neurons we can build arbitrary functions create a mapping function from two sapces of arbitrary dimensionalities capable of representing more complex input-output relationships (\ref{eq:many2many}).
+\begin{equation}
+    \mathbb{R}^N \rightarrow \mathbb{R}^M
+    \label{eq:many2many}
+\end{equation}
+
+\subsection{Network Optimization}
+
+A neural network is defined by a set of weights and biases as its parameters. These parameteres have to be optimized as to maximize the performance in a classification or regression task. For this we define a function that measures the cost of the task (the error being made) as a function of the inputs and weights and biases of the neural network, and iteratively update each weight $w_i$ according to Equation \ref{eq:update_w}, where $L$ is the loss function, $n$ is the iteration step and $\lambda$ is a scalar parameter called learning rate.
+
+\begin{equation}
+    w_i[n+1] = w_i[n] - \lambda \frac{\partial L(\mathbf{x}; \mathbf{w}[n])}{\partial w_i}
+    \label{eq:update_w}
+\end{equation}
+
+The convergence of the loss function is conditioned by the optimization. Nowadays there are techniques that improve the convergence of the loss function such as Adadelta \cite{zeiler2012adadelta} and Adam \cite{kingma2014adam}. %TODO referenciaaaaaaaaaas
+
+The network is optimized using stochastic gradient descent \cite{bottou2010large}, following Equation \ref{eq:update_w}. In order to compute the gradients of the loss function, we use the Back-Propagation algorithm \cite{chauvin1995backpropagation}, which applies the chain rule to compute the gradient of the weights in one layer given the gradients of the pervious layers.
+
+\section{Recurrent neural networks}
+
+Recurrent neural networks (RNN) are a special type of architecture where the outputs of a hidden layer are fed back to the inputs of the layer. This transforms Equation \ref{eq:perceptron} into Equation \ref{eq:recurrent_out}:
+
+\begin{equation}
+    \mathbf{y[n+1]} = \sigma(\mathbf{x}^T \cdot \mathbf{w} + \mathbf{y[n]}^T \cdot \mathbf{u} + b)
+    \label{eq:recurrent_out}
+\end{equation}
+
+Where $\mathbf{u}$ is an additional set of trainable weights for each neuron. This introduces a state in each layer and the network can be optimized to model temporal relations, such as predicting the next value in a sequence of numbers given its past context.
+
+This has a problem however that wasn't mentioned in the previous section but is even more apparent in RNNs. As the network is unrolled through time, the back-propagation has to take more steps the longer the temporal dependencies last. This makes unrolled RNNs become deep very quickly. In each back-propagation step, the gradient of the loss function is multiplied and if this value is multiplied several times by values smaller than 1, it eventually becomes too small for the network to optimize the earlier layers. 
+
+%TODO referenciaaaaaaaas!!!! LSTM GRU, PLSTM, you name it!
+These problems lead to recurrent neural networks to not be trained well enough. To solve this issue, there are special kinds of recurrent neurons that solve this problem.
+
+\subsection{Long Short-Term Memory}
+
+Long Short-Term Memory (LSTM) \cite{hochreiter1997long} are cope with the vanishing gradient problem. They are also capable of modeling better long-term dependencies in a sequence much better than regular RNNs. This is due to it's gating mechanism which control the flow of information.
+
+\subsection{Gated Recurrent Unit (GRU)}
