@@ -2,6 +2,83 @@
 
 In this section, Deep Learning and neural networks are briefly introduced. In addition to that, both the text-to-speech and sentiment analysis tasks are also introduced and discussed, including the challenges that they present as well as the classical and more modern techniques that tackle them, and how they have influenced the development of this project. By the end of this chapter, the core concepts necessary for the discussion of the work done in this publication will have been introduced to the reader.
 
+\section{Speech synthesis}
+
+%Introduction to speech synthesis task
+Speech synthesis is the process of generating a synthetic speech signal, emulating that of a real human being. More specifically, this project focuses on synthesizing the signal given text level information. That means, mapping a piece of text to the sounds a human would make to utter said text, and it has to be possible to generate any text that is given to the system.
+
+Speech synthesis has many applications, from medical to recreational. These systems can be used to give speech impaired people a voice to communicate with and it can also be used by non-sighted people by simulating more human-like interactions between them and the unanimated objects around them.
+
+It can also have beneficial impacts from a more financial perspective, for example, by cheapening the cost of producing audiobooks or other products that require the use of real speech today.
+
+\subsection{Unit selection}
+
+%Description of the unit selection approach
+Unit selection systems function by rendering a speech signal by concatenating waveform fragments from a large single-speaker database \cite{hunt1996unit}. The outcome of this technique is highly natural-sounding speech signal since the fragments that are concatenated come from real speech waveforms. However, while this system is good at producing natural soundounding speech, it lacks the flexibility to produce new speaker sounds or vary the speaking style, as described in \cite{jauk2015creating}, as we are limited by the waveforms database in the first place. Each unit can also have an associate feature vector containig prosodic information such as pitch or formants.
+
+It also has a high storage cost, since we need to have access to all of the waveform fragments to produce the speech signals.
+
+\begin{equation}
+    asd
+    \label{eq:units}
+\end{equation}
+
+To find the best combination of units, a criterion defined in \cite{hunt1996unit} is used which has a cost of concatenation of consecutive units, and a cost that compares the prosodic features of a given unit and some desired prosodic features.
+
+\subsection{Statistical Parametric Speech Synthesis}
+
+In statistical-parametric speech synthesis (SPSS) a set of spectral and excitation parameters are extracted from a speech corpus and then a statistical generative model (typically a hidden Markov model or HMM) is trained to model the them for use in speech synthesis.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=4cm]{figures/hmm}
+    \caption{A 3-state left-to-right Hidden Markov Model.}
+    \label{fig:hmm}
+\end{figure}
+
+As seen in Figure \ref{fig:hmm}, a HMM is a finite state machine that can be described by the touple $\lambda = \left < A, B, \Pi \right >$ where $A$ are the state transition probabilities, $B$ are the output distributions on each state and $\Pi$ are the initial state probabilities (spectral \& excitation output parameters). HMMs are used as generative model since they provide a time-discrete series of observations from a distribution of the speech parameters. In contrast with unit selection, HMM based speech synthesis models offer a more compact representation than unit selection since they don't require a large database after the models have been trained.
+
+\begin{figure}
+    \centering
+    \includegraphics[height=8cm]{figures/hts}
+    \caption{SPSS system based on HMMs.}
+    \label{fig:hts}
+\end{figure}
+
+Moreover, it also overcomes the limitation of only being limited to one speaker, since we can easily modify the speaker characteristics and speaking styles by transforming the HMM parameters apropriately as describes in \cite{zen2007hmm}. 
+
+In the methodology chapter of this document, the concepts from this section will be revisited and explained more in-depth.
+
+\subsection{Recurrent Neural Network-based Speech Synthesis}
+
+%RNNs
+Another approach to speech synthesis that is the one used in this project is using recurrent neural networks (RNNs) to process a sequence of linguistic features to predict the same excitation and spectral parameters from SPSS.
+
+RNNs are covered in more detail in a later section of this chapter. As describes by \cite{chen1998rnn}, this scheme consists of using neural networks to generate parametric speech in two stages: a duration model predict the duration of a phoneme, and an acoustic model to predict the spectral and excitation parameters for as many timesteps as predicted by the duration model. Figure \ref{fig:rnn-tts-0} shows the complete scheme of this approach.
+
+\begin{figure}[h]
+\centering
+    \includegraphics[height=12cm]{figures/rnn-tts}
+    \caption{RNN-based SPSS scheme. Concepts such as LSTM that appear in the figure are covered at later section of this chapter.}
+    \label{fig:rnn-tts-0}
+\end{figure}
+
+\subsection{Expressive}
+
+Summary of the bibliography of the approaches to expressive speech synthesis.
+
+\section{Text classification for sentiment Analysis}
+
+%Introduction to the sentiment or text classification task.
+
+\subsection{End-to-end approach}
+
+Treating text as a regular signal, using word embeddings and convolutional neural networks.
+
+\section{Multimodal learning}
+
+Summary of the bibliography in multimodal learning, the different combinations of modes in the bibliography and how this project is influenced by it.
+
 \section{Deep Learning}
 
 In recent years, deep structured learning, or more commonly called deep learning is a set of techniques that has risen in popuarity and established itself as a new area of machine learning among the scientific and research communities. \cite{deng2014deep}
@@ -14,89 +91,119 @@ In addition to more compute power, large datasets that can take adavantage of de
 
 In summary, one could describe Deep Learning as models capable of obtaining high level information from low level one, and the compute resources and databases that make training of these models possible.
 
-%Deep Learning is a concept that has risen in popularity in recent years among scientists and researchers.
-%It's specially popular in the computer vision and image recognition fields where computational and memory requirements are high.
-%Deep learning is popular thanks to the availability 
+\subsection{Deep Neural Networks}
 
-\section{Deep Neural Networks}
+In Deep Learning, a common architecture is the so called Deep Neural Network (DNN), which is an artificial neural network with a large number of hidden layers. The desire to decomposing a signal into higher levels of abstraction drives such neural networks configurations, and since more layers require more trainable parameters, large amounts of training data are also needed to train them.
 
-%TODO needs references!!
-
-In deep learning, a common architecture is the so called deep neural network, which is an artificial neural network with a large number of hidden layers. The desire to decomposing a signal into higher levels of abstraction drives such neural networks configurations, and since more layers require more trainable parameters, large amounts of training data are also needed to train them.
-
-To begin this section, the basic unit of a neural network is introduced to solve a classifiation problem. After that, we see how these basic units can be combined to learn more complex relationships and deal with more generic distributions of data.
-
-\subsection{From the perceptron to neural networks}
-
-\begin{figure}
+\begin{figure}[h]
     \centering
-    Hello figure
-    \caption{Figure caption goes here!}
-    \label{fig:perceptron}
+    
+    \begin{tikzpicture}
+        \foreach \x in {0,...,4} {
+            \foreach \y in {0,...,4} {
+                \draw(0,\x * 0.75) -- (2,\y * 0.75);
+            }
+        }
+        \foreach \x in {0,...,4} {
+            \draw[fill=white](0,\x * 0.75) circle(0.3);
+            \draw[fill=white](2,\x * 0.75) circle(0.3);
+        }
+    \end{tikzpicture}
+
+    \caption{Neural network basic configuration. Each layer consists of a net of nodes chich perform a linear operation of the inputs, before being fed to an activation function at the output and fed to the next layer.}
+    \label{fig:neural-net}
 \end{figure}
 
-%TODO needs references!!!
-The basic unit of a neural network is the neuron. A neuron is defined by a set of scalar inputs (including a bias constant term), a linear operation of these inputs, and an activation function at the output (Figure \ref{fig:perceptron}). This configuration is also called Perceptron.
-
-The Perceptron is therefore defined by a set of parameters: the weights of the linear operation and the bias term. Equation \ref{eq:perceptron} shows the operation that takes place, where $\mathbf{x}$ is the input vector, $\mathbf{w}$ are the input weights, $b$ is the bias term, $\sigma$ is the diferentiable activation function, often a $sigmoid$ (\ref{eq:sigmoid}) or a $tanh$, and $y$ is the output. For the sake of simplicity, the remainder of this section assumes $\sigma$ to be a sigmoid.
+DNNs are defined by stacking several layers of basic units called neurons. In each layer, a linear operation takes place, where the inputs $\mathbf{x}= \left \{ 1, x_1, x_2, ..., x_N \right \}$ ($1$ is for a bias term) are linearly combined by a set of weights that are characteristic of each layer. The output of this linear operation is fed to a non-linear activation function (such as a sigmoid (\ref{eq:sigmoid}) or a tanh) which introduces the non-linearities of the system and is differentiiable (property that will be relevant for optimizing or training the weights). Equation \ref{eq:neural-layer} shows the operation that takes place in the $i$-th layer, where $\mathbf{W_i}$  is the matrix of weights, $\mathbf{x_i}$ is the input vector of the layer, $\mathbf{y_i}$ is the output vector and $\sigma$ is the activation function.
 
 \begin{equation}
-    \mathbf{y} = \sigma(\mathbf{x}^T \cdot \mathbf{w} + b)
-    \label{eq:perceptron}
+    \centering
+    \mathbf{y_i} = \sigma \left ( \mathbf{W_i} \cdot \mathbf{x_i} \right )
+    \label{eq:neural-layer}
 \end{equation}
 
 \begin{equation}
-    \sigma (x) = \frac{1}{1 + e^{-x}}
+    \centering
+    \sigma (x) = \frac{1}{1 + e^{-x}} 
     \label{eq:sigmoid}
 \end{equation}
 
-Assume a binary classification task, where the inputs yielding an activation above a certain defined threshold belong to one class. The perceptron has an intuitive geometrical interpretation. The weights of the equation ${w_1, w_2, ... w_n}$ and the bias term $b$ represent the rotation translation of the decission boundary that's splits the hyperspace in two regions.
+The outputs of this activation function are fed to the next layer of neurons until the last layer of a network, typically a softmax activation function for classification tasks or linear operation in regression ones. Figure \ref{fig:neural-net} shows a neural network configuration.
 
-\begin{figure}
-    \center
-    Hello
-    %\includegraphics[width=0.75\textwidth]{figures/neural-network}
-    \caption{Model composed of hierarchicaly stacked neurons (neural network)}
-    \label{fig:stacking}
-\end{figure}
+\subsection{Optimization}
 
-By stacking several of these neurons we can build arbitrary functions create a mapping function from two sapces of arbitrary dimensionalities capable of representing more complex input-output relationships (\ref{eq:many2many}).
+%Back propagation algorithm and optimizers.
+Optimizing, or training, a DNN is the process of finding the best possible set of weights that accomplish the best results in a given task. A task that DNNs are used for is classification, where a label is assigned to each input vector (predicting the wether an image is from a cat or a dog) and also regression (predicting the expected cost of a property given the land size and proximity to the coast).
+
 \begin{equation}
-    \mathbb{R}^N \rightarrow \mathbb{R}^M
-    \label{eq:many2many}
+    L(\mathbf{x}; \mathbf{w}) = \sum_{\mathbf{x}_k}^{} L_i (\mathbf{x_k})
+    \label{eq:loss}
 \end{equation}
-
-\subsection{Network Optimization}
-
-A neural network is defined by a set of weights and biases as its parameters. These parameteres have to be optimized as to maximize the performance in a classification or regression task. For this we define a function that measures the cost of the task (the error being made) as a function of the inputs and weights and biases of the neural network, and iteratively update each weight $w_i$ according to Equation \ref{eq:update_w}, where $L$ is the loss function, $n$ is the iteration step and $\lambda$ is a scalar parameter called learning rate.
 
 \begin{equation}
     w_i[n+1] = w_i[n] - \lambda \frac{\partial L(\mathbf{x}; \mathbf{w}[n])}{\partial w_i}
     \label{eq:update_w}
 \end{equation}
 
-The convergence of the loss function is conditioned by the optimization. Nowadays there are techniques that improve the convergence of the loss function such as Adadelta \cite{zeiler2012adadelta} and Adam \cite{kingma2014adam}. %TODO referenciaaaaaaaaaas
+To optimize the network a cost or loss function is defined to measure the error of the predictions (such as the root mean square error or the cross-entropy error \cite{golik2013cross}). given a loss, we can find improve the performance of a model by translating the weight vector of the model in the direction of the gradient.
 
-The network is optimized using stochastic gradient descent \cite{bottou2010large}, following Equation \ref{eq:update_w}. In order to compute the gradients of the loss function, we use the Back-Propagation algorithm \cite{chauvin1995backpropagation}, which applies the chain rule to compute the gradient of the weights in one layer given the gradients of the pervious layers.
+Equation \ref{eq:loss} is a general loss function, computed by adding the errors of a batch of vectors of a dataset. These vectors are the examples from where the network learns. The size of the batch is usually fixed and smaller than the total size of the dataset, and is used to perform an iteration in the weight update process (Equation \ref{eq:update_w}). This technique is called stochastic gradient descent \cite{bottou2010large} (SGD).
 
-\section{Recurrent neural networks}
+Before updating the weights, the partial derivatives of the loss function are computed using the back-propagation algorithm \cite{chauvin1995backpropagation}. For this we need to be able to compute the derivatives of both the loss function and the activation functions of the neurons.
 
-Recurrent neural networks (RNN) are a special type of architecture where the outputs of a hidden layer are fed back to the inputs of the layer. This transforms Equation \ref{eq:perceptron} into Equation \ref{eq:recurrent_out}:
+After computing the derivatives, the norm of the gradient can be scaled by a factor called learning rate (expressed as $\lambda$ in Equation \ref{eq:update_w}) that can be used to speed-up or slow-down the convergence of the loss function during training. Other ways to improve this update are Adam \cite{kingma2014adam} and Adadelta \cite{zeiler2012adadelta}.
+
+%\begin{figure}
+%    \centering
+%    \includegraphics[height=6cm]{figures/backpropagation}
+%    \caption{back propagation}
+%    \label{fig:back-prop}
+%\end{figure}
+
+%To obtain the gradients of the loss function with respect to the weights, the back-propagation algorithm \cite{chauvin1995backpropagation} is used to compute them analytically. This algorithm computes the partial derivatives of the loss function with respect to the weights, given the partial derivatives of the layers later layers, hence the name back-propagation. For this to work, the loss function has to be diferentiable and for this to be true the activation functions of the hidden layers also have to be as well.
+
+%Equation \ref{eq:loss} implies that the loss can be computed given a batch of input vectors, thus the weight updates happen after the network has processed a collection of inputs. We don't need however to process an entire dataset and only use a small portion of it before the update step, in a techniche called stochastic gradient descent (SGD) \cite{bottou2010large}.
+
+\section{Recurrent networks}
+
+%Introductio to RNNs. How they are trained and introduction of the vanishing/exploding gradient.
+Recurrent neural networks (RNN) are a special type of architecture capable of modeling sequences, where the outputs of a hidden layer are fed back to the inputs of the same layer. This feedback loop introduces a state in the neurons and the output of the layers can be rewritten as:
 
 \begin{equation}
-    \mathbf{y[n+1]} = \sigma(\mathbf{x}^T \cdot \mathbf{w} + \mathbf{y[n]}^T \cdot \mathbf{u} + b)
-    \label{eq:recurrent_out}
+    \centering
+    \mathbf{y_t} = \sigma \left ( \mathbf{W} \cdot \mathbf{x_t} + \mathbf{U_t} \cdot \mathbf{y_{t-1}} \right )
+    \label{eq:out-rec}
 \end{equation}
 
-Where $\mathbf{u}$ is an additional set of trainable weights for each neuron. This introduces a state in each layer and the network can be optimized to model temporal relations, such as predicting the next value in a sequence of numbers given its past context.
+Where $\mathbf{x}[n]$ is an input vector at the $n$-th timestep and $\mathbf{U_i}$ is an additional set of tranable weights. Because of the introduction of a neuron state, RNNs can model various types of sequential data (predict the next frame of a video given the N first, translate a phrase into a different language, etc...).
 
-This has a problem however that wasn't mentioned in the previous section but is even more apparent in RNNs. As the network is unrolled through time, the back-propagation has to take more steps the longer the temporal dependencies last. This makes unrolled RNNs become deep very quickly. In each back-propagation step, the gradient of the loss function is multiplied and if this value is multiplied several times by values smaller than 1, it eventually becomes too small for the network to optimize the earlier layers. 
+Recurrent networks can still be trained efficiently by using back-propagation through time \cite{werbos1990backpropagation} which is specific case of back-propagation where the errors are also back-propagation back in time in the same ways that they are propagated backwards from the outputs to the inputs of the network. If we expand \ref{eq:out-rec} we get:
 
-%TODO referenciaaaaaaaas!!!! LSTM GRU, PLSTM, you name it!
-These problems lead to recurrent neural networks to not be trained well enough. To solve this issue, there are special kinds of recurrent neurons that solve this problem.
+\begin{figure}
+    \centering
+    \includegraphics[height=4cm]{figures/unfold}
+    \caption{Unfolded RNN}
+    \label{fig:unfold}
+\end{figure}
 
-\subsection{Long Short-Term Memory}
+\begin{equation}
+    \centering
+    \mathbf{y_t} = \sigma \left ( \mathbf{W} \cdot \mathbf{x_t} + \mathbf{U_t} \cdot \sigma \left ( \mathbf{W} \cdot \mathbf{x_{t-1}} + \mathbf{U_{t-1}} \cdot \sigma \left ( \cdots \sigma \left ( \cdots \right ) \cdots \right ) \right ) \right )
+    \label{eq:out-rec-expanded}
+\end{equation}
 
-Long Short-Term Memory (LSTM) \cite{hochreiter1997long} are cope with the vanishing gradient problem. They are also capable of modeling better long-term dependencies in a sequence much better than regular RNNs. This is due to it's gating mechanism which control the flow of information.
+The recursive multiplication of $U_t$ make RNNs a special case of DNNs, where the repeated multiplications can cause the gradients to become too small or too big by the time they reach the inputs of the network when doing back-propagation. This is due to the vanishing or exploding gradient problem, as described in \cite{bengio1994learning}, that occurs during training with SGD.
 
-\subsection{Gated Recurrent Unit (GRU)}
+To mitigate this problem in RNNs, we can use specially designed recurrent neurons such as Long Short-Term Memory as upposed to regular RNNs.
+
+\subsection{Long Short-Term Memory (LSTM)}
+
+Long Short-Term Memory \cite{hochreiter1997long} or LSTM are a special kind of recurrent unit that deals with the aforementioned problem of the vanishing gradient. This cell works by introducing gating mechanism operated by soft switches than are trained while optimizing the network to control the flow of information coming in and out of the cell. Figure \ref{fig:lstm}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=4cm]{figures/lstm-chain}
+    \caption{Diagram of a chain of LSTM units. The horizontal axis represents time and the vertical represents the RNN-LSTM at each timestep. $X_t$ are the input vectors at the past, present and future timestep. The gating mechanism controls the flow of information that is input to the next state of the layer. This ffigure was taken from \cite{lstm}}
+    \label{fig:lstm}
+\end{figure}
+
