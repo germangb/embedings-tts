@@ -9,12 +9,12 @@ Speech synthesis is the process of generating a synthetic speech signal, emulati
 
 Speech synthesis has many applications, from medical to recreational. These systems can be used to give speech impaired people a voice to communicate with and it can also be used by non-sighted people by simulating more human-like interactions between them and the unanimated objects around them.
 
-It can also have beneficial impacts from a more financial perspective, for example, by cheapening the cost of producing audiobooks or other products that require the use of real speech today.
+%It can also have beneficial impacts from a more financial perspective, for example, by cheapening the cost of producing audiobooks or other products that require the use of real speech today.&
 
 \subsection{Unit selection}
 
 %Description of the unit selection approach
-Unit selection systems function by rendering a speech signal by concatenating waveform fragments from a large single-speaker database \cite{hunt1996unit}. The outcome of this technique is highly natural-sounding speech signal since the fragments that are concatenated come from real speech waveforms. However, while this system is good at producing natural soundounding speech, it lacks the flexibility to produce new speaker sounds or vary the speaking style, as described in \cite{jauk2015creating}, as we are limited by the waveforms database in the first place. Each unit can also have an associate feature vector containig prosodic information such as pitch or formants.
+Unit selection systems function by rendering a speech signal by concatenating waveform fragments from a large single-speaker database \cite{hunt1996unit}. The outcome of this technique is highly natural-sounding speech signal since the fragments that are concatenated come from real speech waveforms. However, while this system is good at producing natural sounding speech, it lacks the flexibility to produce new speaker sounds or vary the speaking style, as described in \cite{jauk2015creating}, as we are limited by the waveforms database in the first place. Each unit can also have an associate feature vector containing prosodic information such as pitch or formants.
 
 It also has a high storage cost, since we need to have access to all of the waveform fragments to produce the speech signals.
 
@@ -23,7 +23,8 @@ It also has a high storage cost, since we need to have access to all of the wave
     \label{eq:units}
 \end{equation}
 
-To find the best combination of units, a criterion defined in \cite{hunt1996unit} is used which has a cost of concatenation of consecutive units, and a cost that compares the prosodic features of a given unit and some desired prosodic features.
+%To find the best combination of units, a criterion defined in \cite{hunt1996unit} is used which has a cost of concatenation of consecutive units, and a cost that compares the prosodic features of a given unit and some desired prosodic features.
+The best sequence of concatenated units is found by means of dynamic programming using the Viterbi algorithm minimizing the cost of concatenating consecutive units. The cost of concatenation is defined by \cite{unit-cost}. Given a sequence of concatenated units $u$, the total cost of concatenation is given by:
 
 \subsection{Statistical Parametric Speech Synthesis}
 
@@ -36,29 +37,29 @@ In statistical-parametric speech synthesis (SPSS) a set of spectral and excitati
     \label{fig:hmm}
 \end{figure}
 
-As seen in Figure \ref{fig:hmm}, a HMM is a finite state machine that can be described by the touple $\lambda = \left < A, B, \Pi \right >$ where $A$ are the state transition probabilities, $B$ are the output distributions on each state and $\Pi$ are the initial state probabilities (spectral \& excitation output parameters). HMMs are used as generative model since they provide a time-discrete series of observations from a distribution of the speech parameters. In contrast with unit selection, HMM based speech synthesis models offer a more compact representation than unit selection since they don't require a large database after the models have been trained.
+As seen in Figure \ref{fig:hmm}, a HMM is a finite state machine that can be described by the tuple $\lambda = \left < A, B, \Pi \right >$ where $A$ are the state transition probabilities, $B$ are the output distributions on each state and $\Pi$ are the initial state probabilities (spectral \& excitation output parameters). HMMs are used as generative model since they provide a time-discrete series of observations from a distribution of the speech parameters. In contrast with unit selection, HMM based speech synthesis models offer a more compact representation than unit selection since they don't require a large database after the models have been trained.
 
 \begin{figure}
     \centering
-    \includegraphics[height=8cm]{figures/hts}
+    \includegraphics[height=12cm]{figures/hts}
     \caption{SPSS system based on HMMs.}
     \label{fig:hts}
 \end{figure}
 
-Moreover, it also overcomes the limitation of only being limited to one speaker, since we can easily modify the speaker characteristics and speaking styles by transforming the HMM parameters apropriately as describes in \cite{zen2007hmm}. 
+Moreover, it also overcomes the limitation of only being limited to one speaker, since we can easily modify the speaker characteristics and speaking styles by transforming the HMM parameters appropriately as describes in \cite{zen2007hmm}. 
 
 In the methodology chapter of this document, the concepts from this section will be revisited and explained more in-depth.
 
-\subsection{Recurrent Neural Network-based Speech Synthesis}
+\subsection{Recurrent Neural Network-based Speech Synthesis} \label{sec:rnn-tts}
 
 %RNNs
 Another approach to speech synthesis that is the one used in this project is using recurrent neural networks (RNNs) to process a sequence of linguistic features to predict the same excitation and spectral parameters from SPSS.
 
-RNNs are covered in more detail in a later section of this chapter. As describes by \cite{chen1998rnn}, this scheme consists of using neural networks to generate parametric speech in two stages: a duration model predict the duration of a phoneme, and an acoustic model to predict the spectral and excitation parameters for as many timesteps as predicted by the duration model. Figure \ref{fig:rnn-tts-0} shows the complete scheme of this approach.
+RNNs are covered in more detail in a later section of this chapter. As describes by \cite{chen1998rnn}, this scheme consists of using neural networks to generate parametric speech in two stages: a duration model predict the duration of a phoneme, and an acoustic model to predict the spectral and excitation parameters for as many time steps as predicted by the duration model. Figure \ref{fig:rnn-tts-0} shows the complete scheme of this approach.
 
-\begin{figure}[h]
+\begin{figure}
 \centering
-    \includegraphics[height=12cm]{figures/rnn-tts}
+    \includegraphics[height=16cm]{figures/rnn-tts}
     \caption{RNN-based SPSS scheme. Concepts such as LSTM that appear in the figure are covered at later section of this chapter.}
     \label{fig:rnn-tts-0}
 \end{figure}
@@ -71,23 +72,15 @@ Summary of the bibliography of the approaches to expressive speech synthesis.
 
 %Introduction to the sentiment or text classification task.
 
-\subsection{End-to-end approach}
-
-Treating text as a regular signal, using word embeddings and convolutional neural networks.
-
-\section{Multimodal learning}
-
-Summary of the bibliography in multimodal learning, the different combinations of modes in the bibliography and how this project is influenced by it.
-
 \section{Deep Learning}
 
-In recent years, deep structured learning, or more commonly called deep learning is a set of techniques that has risen in popuarity and established itself as a new area of machine learning among the scientific and research communities. \cite{deng2014deep}
+In recent years, deep structured learning, or more commonly called deep learning is a set of techniques that has risen in popularity and established itself as a new area of machine learning among the scientific and research communities. \cite{deng2014deep}
 
-\cite{bengio2009learning} discussed the limitations of shallow architectures and provided a theoretical basis to the advantages of deeper ones. But it has only been in recent years that such architectures have been able to be put into production with ever-growing pupularity thanks to compute technologies being every time more available and affordable to consumers.
+\cite{bengio2009learning} discussed the limitations of shallow architectures and provided a theoretical basis to the advantages of deeper ones. But it has only been in recent years that such architectures have been able to be put into production with ever-growing popularity thanks to compute technologies being every time more available and affordable to consumers.
 
 With deep learning architectures, it is possible to learn complex non-linear representations from large amounts of data. Raw data can be processed and turned into several levels of higher level representations to make it possible to reason about them and make tasks such as classification easier and more effective.
 
-In addition to more compute power, large datasets that can take adavantage of deep models such Imagenet \cite{russakovsky2015imagenet} are being made publicly available. These datasets are often used as benchmarks and serve as points of reference to drive research and development forward.
+In addition to more compute power, large datasets that can take advantage of deep models such Imagenet \cite{russakovsky2015imagenet} are being made publicly available. These datasets are often used as benchmarks and serve as points of reference to drive research and development forward.
 
 In summary, one could describe Deep Learning as models capable of obtaining high level information from low level one, and the compute resources and databases that make training of these models possible.
 
@@ -175,7 +168,7 @@ Recurrent neural networks (RNN) are a special type of architecture capable of mo
     \label{eq:out-rec}
 \end{equation}
 
-Where $\mathbf{x}[n]$ is an input vector at the $n$-th timestep and $\mathbf{U_i}$ is an additional set of tranable weights. Because of the introduction of a neuron state, RNNs can model various types of sequential data (predict the next frame of a video given the N first, translate a phrase into a different language, etc...).
+Where $\mathbf{x}[n]$ is an input vector at the $n$-th timestep and $\mathbf{U_i}$ is an additional set of tranable weights. Because of the introduction of a neuron state, RNNs can model various types of sequential data (predict the next frame of a video given the N first, translate a sequence of words to another a different language, predict the duration of each of the phonemes in a sequence, etc...).
 
 Recurrent networks can still be trained efficiently by using back-propagation through time \cite{werbos1990backpropagation} which is specific case of back-propagation where the errors are also back-propagation back in time in the same ways that they are propagated backwards from the outputs to the inputs of the network. If we expand \ref{eq:out-rec} we get:
 

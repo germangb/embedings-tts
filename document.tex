@@ -1,14 +1,18 @@
 \documentclass[11pt,a4paper]{report}                                                    
 \usepackage[utf8]{inputenc}                                                             
 \usepackage{amsmath}                                                                    
+\usepackage{booktabs}
 \usepackage{amsfonts}                                                                   
 \usepackage{amssymb}                                                                    
+\usepackage{verbatim}                                                                    
+\usepackage{listings}
 \usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.                            
 \usepackage[hidelinks]{hyperref}                                                        
 \usepackage{adjustbox}                                                                  
 \usepackage{float}                                                                      
 \usepackage{subcaption}                                                                 
 \usepackage{array}                                                                      
+\usepackage{longtable}                                                                      
 \usepackage{eurosym}                                                                    
 \usepackage[pages=some]{background}                                                     
 \usepackage{fancyhdr}                                                                   
@@ -17,7 +21,7 @@
 \usepackage{etoolbox}                                                                   
 \usepackage{pdfpages}                                                                   
 \usepackage{tikz,pgfplotstable}                                                         
-\usetikzlibrary{arrows, positioning}                                                    
+\usetikzlibrary{shapes,arrows,positioning}
 \usepackage{pgfgantt}                                                                   
 \usepackage{neuralnetwork}                                                              
 \pgfplotsset{compat=1.13}                                                               
@@ -30,9 +34,51 @@
 
 \usepackage[parfill]{parskip}
 
+%% PER MODIFICAR EL QUE OCUPA EL TEXT EN EL DOCUMENT:                                                 
+\usepackage[a4paper, total={15.4cm, 24cm}]{geometry}                                                  
+\geometry{top=3cm}                                 
+
+%% PER TREURE L'ESPAIAT DELS CHAPTERS:             
+\makeatletter                                      
+\patchcmd{\@makechapterhead}{\vspace*{50\p@}}{}{}{}%                                                  
+\patchcmd{\@makeschapterhead}{\vspace*{50\p@}}{}{}{}%                                                 
+\patchcmd{\@makechapterhead}{\vskip 40\p@}{\vskip 10\p@}{}{}%                                         
+\patchcmd{\@makeschapterhead}{\vskip 40\p@}{\vskip 10\p@}{}{}%                                        
+\patchcmd{\@makechapterhead}{\vskip 20\p@}{\vskip 10\p@}{}{}%                                         
+\patchcmd{\@makeschapterhead}{\vskip 20\p@}{\vskip 10\p@}{}{}%                                        
+\makeatother                                       
+
+% IF PDF                                           
+\newif\ifpdf                                       
+\ifx\pdfoutput\undefined                           
+   \pdffalse                                       
+\else                                              
+   \pdfoutput=1                                    
+   \pdftrue                                        
+\fi                                                
+\ifpdf                                             
+   \usepackage{graphicx}                           
+   \usepackage{epstopdf}                           
+   \DeclareGraphicsRule{.eps}{pdf}{.pdf}{`epstopdf #1}                                                
+   \pdfcompresslevel=9                             
+\else                                              
+   \usepackage{graphicx}                           
+\fi   
+
+\DeclareGraphicsExtensions{.bmp,.png,.pdf,.jpg,.eps,.svg}
+\author{German Gomez Bajo}
+\setlength{\parindent}{3ex}
+\setlength{\parskip}{12pt}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\pagestyle{fancy}                                                                                                                                                                                           
+
+
 \begin{document}
 
 \tableofcontents
+\listoffigures
 
 \input{1_introduction}
 \input{2_stateofart}
