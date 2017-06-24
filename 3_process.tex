@@ -5,7 +5,7 @@
 
 \section{Baseline development}
 
-The first stage of this project was to develop a baseline speech synthesizer. This model is used as a reference when comparing the results of the subsequent experiments explained in later sections of this chapter. The architecture is based on the work done by \cite{santi06} by using the Socrates Text-to-speech framework. This is a RNN-LSTM based model, which, as mentioned in section \ref{sec:rnn-tts}, contains a duration model and an acoustic model which are trained independently.
+The first stage of this project was to develop a baseline speech synthesizer. This model is used as a reference when comparing the results of the subsequent experiments explained in later sections of this chapter. The architecture is based on the work done by \cite{santi06} by using the Socrates Text-to-speech framework, which is based on the Keras deep learning library. This is a RNN-LSTM based model, which, as mentioned in section \ref{sec:rnn-tts}, contains a duration model and an acoustic model which are trained independently.
 
 \begin{figure}[h]
     \centering
@@ -283,9 +283,13 @@ Once we have ensambled the linguistic features, we discard of those who referenc
 
 \section{Expressive synthesis development}
 
-\section{Sentiment analysis \& embedding extraction task}
+%TODO
+The baseline system has been explained. Once we had the system up and running it was time to introduce the modifications that would allow for expressive speech to be modeled by the system. The way this is done in this project is by introducing a new set of features as inputs to the system (both the duration and acoustic model). These are known as the embedding that encapsulate the information about the way a given sentence is supposed to be uttered as. In this section we describe the process of obtaining these new features. Other than these new inputs, the developed system shares the same architecture from the baseline system.
 
-Explain the two networks, the datasets used and how the data was prepared to be fed into the training process and how to obtain the expressive embeddings that will be used in the next section
+\subsection{Sentiment analysis \& embedding extraction task}
+
+To obtain the embeddings, we define three 
+%Explain the two networks, the datasets used and how the data was prepared to be fed into the training process and how to obtain the expressive embeddings that will be used in the next section
 
 \section{Experiments}
 

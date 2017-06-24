@@ -1,30 +1,58 @@
 \chapter{State of the art}
 
-In this section, Deep Learning and neural networks are briefly introduced. In addition to that, both the text-to-speech and sentiment analysis tasks are also introduced and discussed, including the challenges that they present as well as the classical and more modern techniques that tackle them, and how they have influenced the development of this project. By the end of this chapter, the core concepts necessary for the discussion of the work done in this publication will have been introduced to the reader.
+%In this chapter, Deep Learning and neural networks are briefly introduced. In addition to that, both the text-to-speech and sentiment analysis tasks are also introduced and discussed, including the challenges that they present as well as the classical and more modern techniques that tackle them, and how they have influenced the development of this project. By the end of this chapter, the core concepts necessary for the discussion of the work done in this publication will have been introduced to the reader.
+This chapter gives a brief introduction to the background of this project. The first thing that is discussed is classical methods of speech synthesis, as well as a brief mention of deep learning methods used in this particular task.
+
+Next there is a brief introduction to Deep Learning and deep architectures (both definition and training) a field that is applied to this project. By the end of this chapter, the necessary background will have been introduced for its application in the next chapter.
 
 \section{Speech synthesis}
 
 %Introduction to speech synthesis task
 Speech synthesis is the process of generating a synthetic speech signal, emulating that of a real human being. More specifically, this project focuses on synthesizing the signal given text level information. That means, mapping a piece of text to the sounds a human would make to utter said text, and it has to be possible to generate any text that is given to the system.
 
-Speech synthesis has many applications, from medical to recreational. These systems can be used to give speech impaired people a voice to communicate with and it can also be used by non-sighted people by simulating more human-like interactions between them and the unanimated objects around them.
+Speech synthesis has many applications, from medical to recreational. These systems can be used to help speech impaired people and it can also be used to design more human-like interactions objects.
 
 %It can also have beneficial impacts from a more financial perspective, for example, by cheapening the cost of producing audiobooks or other products that require the use of real speech today.&
 
 \subsection{Unit selection}
 
 %Description of the unit selection approach
-Unit selection systems function by rendering a speech signal by concatenating waveform fragments from a large single-speaker database \cite{hunt1996unit}. The outcome of this technique is highly natural-sounding speech signal since the fragments that are concatenated come from real speech waveforms. However, while this system is good at producing natural sounding speech, it lacks the flexibility to produce new speaker sounds or vary the speaking style, as described in \cite{jauk2015creating}, as we are limited by the waveforms database in the first place. Each unit can also have an associate feature vector containing prosodic information such as pitch or formants.
+Unit selection systems render a speech signal by concatenating waveform fragments from a large single-speaker database \cite{hunt1996unit}. The outcome of this technique is highly natural-sounding speech since the fragments that are concatenated come from real waveforms. However, while this system is good at producing natural sounding speech, it lacks the flexibility to produce new speaker sounds or vary the speaking style, as described in \cite{jauk2015creating}, since we are limited by the waveforms database. Each unit also has an associated feature vector containing prosodic information such as pitch and formants.
 
-It also has a high storage cost, since we need to have access to all of the waveform fragments to produce the speech signals.
+\begin{comment}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=10cm]{figures/unitsel}
+    \caption{Unit selection scheme.}
+    \label{eq:units}
+\end{figure}
+\end{comment}
+
+%The best sequence of concatenated units is found by means of dynamic programming using the Viterbi algorithm,  minimizing the cost of concatenating consecutive units. The cost of concatenation is defined in \cite{unit-cost}. Given a sequence of units $u_1^N$, their corresponding prosodic feature vectors $p_1^N$, the total cost of concatenation has two terms:
+To choose the best sequence of concatenated units, a cost of concatenation is defined \cite{unit-cost} given a sequence of units $u_1^N = \left \{ u_1, u_2, ..., u_N \right \}$ and their corresponding prosodic vectors $p_1^N$:
 
 \begin{equation}
-    asd
-    \label{eq:units}
+    C_T^p = C_T^p (u_1^N) = \sum_{i = 1}^{N} C_p (p_t, p_i) 
+    \label{eq:pros-cost}
 \end{equation}
 
-%To find the best combination of units, a criterion defined in \cite{hunt1996unit} is used which has a cost of concatenation of consecutive units, and a cost that compares the prosodic features of a given unit and some desired prosodic features.
-The best sequence of concatenated units is found by means of dynamic programming using the Viterbi algorithm minimizing the cost of concatenating consecutive units. The cost of concatenation is defined by \cite{unit-cost}. Given a sequence of concatenated units $u$, the total cost of concatenation is given by:
+\begin{equation}
+    C_T^c = C_T^c (u_1^N) = \sum_{i = 2}^{N} C_c (u_{i-1}, u_i) 
+    \label{eq:concat-cost}
+\end{equation}
+
+Where $C_p$ is a function that measures the cost of using a specific feature vector (for example if the units have matching formants and pitch) to match a given target $p_t$ and $C_c$ is the cost of concatenation of two consecutive units (for example a unit ends with the same pitch level that the next one starts with). Finding the best sequence of units is done by using the Viterbi algorithm to minimize the total concatenation cost:
+
+\begin{equation}
+    u_1^N= \underset{u_1^N}{argmax} \left \{ \rho \cdot C_T^p (u_1^N) + (1-\rho) \cdot C_T^c (u_1^N) \right \}
+    \label{eq:unit-cost}
+\end{equation}
+
+\begin{equation}
+    0 \le \rho \le 1
+\end{equation}
+
+Where $\rho$ is a weighting term that can be used to pay more attention to the targets that to the concatenation, or vice versa.
 
 \subsection{Statistical Parametric Speech Synthesis}
 
@@ -42,22 +70,22 @@ As seen in Figure \ref{fig:hmm}, a HMM is a finite state machine that can be des
 \begin{figure}
     \centering
     \includegraphics[height=12cm]{figures/hts}
-    \caption{SPSS system based on HMMs.}
+    \caption{SPSS system based on HMMs. This scheme corresponds to the HTS framework \cite{zen2007hmm}.}
     \label{fig:hts}
 \end{figure}
 
 Moreover, it also overcomes the limitation of only being limited to one speaker, since we can easily modify the speaker characteristics and speaking styles by transforming the HMM parameters appropriately as describes in \cite{zen2007hmm}. 
 
-In the methodology chapter of this document, the concepts from this section will be revisited and explained more in-depth.
+%In the methodology chapter of this document, the concepts from this section will be revisited and explained more in-depth.
 
 \subsection{Recurrent Neural Network-based Speech Synthesis} \label{sec:rnn-tts}
 
 %RNNs
-Another approach to speech synthesis that is the one used in this project is using recurrent neural networks (RNNs) to process a sequence of linguistic features to predict the same excitation and spectral parameters from SPSS.
+Another approach to speech synthesis more closely related to the implementation of this project, is using recurrent neural networks (RNNs) to process a sequence of linguistic features to predict the same excitation and spectral parameters from SPSS.
 
-RNNs are covered in more detail in a later section of this chapter. As describes by \cite{chen1998rnn}, this scheme consists of using neural networks to generate parametric speech in two stages: a duration model predict the duration of a phoneme, and an acoustic model to predict the spectral and excitation parameters for as many time steps as predicted by the duration model. Figure \ref{fig:rnn-tts-0} shows the complete scheme of this approach.
+RNNs are covered in more detail in a later section of this chapter. As describes by \cite{chen1998rnn}, this scheme consists of using neural networks to generate parametric speech in two stages: a duration model that predicts the duration of a phoneme in a sentence, and an acoustic model to predict the spectral and excitation parameters for as many time steps as predicted by the duration model. Figure \ref{fig:rnn-tts-0} shows the complete scheme of this approach.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
     \includegraphics[height=16cm]{figures/rnn-tts}
     \caption{RNN-based SPSS scheme. Concepts such as LSTM that appear in the figure are covered at later section of this chapter.}
@@ -185,7 +213,7 @@ Recurrent networks can still be trained efficiently by using back-propagation th
     \label{eq:out-rec-expanded}
 \end{equation}
 
-The recursive multiplication of $U_t$ make RNNs a special case of DNNs, where the repeated multiplications can cause the gradients to become too small or too big by the time they reach the inputs of the network when doing back-propagation. This is due to the vanishing or exploding gradient problem, as described in \cite{bengio1994learning}, that occurs during training with SGD.
+The recursive multiplication of $U_t$ make RNNs a special case of DNNs, where the repeated multiplications can cause the gradients to become too small or too big by the time they reach the inputs of the network when doing back-propagation. This is due to the vanishing or exploding gradient problem \cite{bengio1994learning} that occurs in SGD.
 
 To mitigate this problem in RNNs, we can use specially designed recurrent neurons such as Long Short-Term Memory as upposed to regular RNNs.
 

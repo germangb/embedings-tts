@@ -1,9 +1,9 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {2.1}{\ignorespaces A 3-state left-to-right Hidden Markov Model.\relax }}{5}{figure.caption.3}
-\contentsline {figure}{\numberline {2.2}{\ignorespaces SPSS system based on HMMs.\relax }}{6}{figure.caption.4}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces SPSS system based on HMMs. This scheme corresponds to the HTS framework \cite {zen2007hmm}.\relax }}{6}{figure.caption.4}
 \contentsline {figure}{\numberline {2.3}{\ignorespaces RNN-based SPSS scheme. Concepts such as LSTM that appear in the figure are covered at later section of this chapter.\relax }}{7}{figure.caption.5}
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Neural network basic configuration. Each layer consists of a net of nodes chich perform a linear operation of the inputs, before being fed to an activation function at the output and fed to the next layer.\relax }}{8}{figure.caption.6}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Neural network basic configuration. Each layer consists of a net of nodes chich perform a linear operation of the inputs, before being fed to an activation function at the output and fed to the next layer.\relax }}{9}{figure.caption.6}
 \contentsline {figure}{\numberline {2.5}{\ignorespaces Unfolded RNN\relax }}{10}{figure.caption.7}
 \contentsline {figure}{\numberline {2.6}{\ignorespaces Diagram of a chain of LSTM units. The horizontal axis represents time and the vertical represents the RNN-LSTM at each timestep. $X_t$ are the input vectors at the past, present and future timestep. The gating mechanism controls the flow of information that is input to the next state of the layer. This ffigure was taken from \cite {lstm}\relax }}{11}{figure.caption.8}
 \addvspace {10\p@ }
