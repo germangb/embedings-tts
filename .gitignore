@@ -1,3 +1,4 @@
+*.lot
 *.bk
 *.swp
 *.aux
@@ -5,5 +6,4 @@
 *.out
 *.blg
 *.bbl
-*.pdf
 *.toc

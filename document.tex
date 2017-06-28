@@ -4,6 +4,7 @@
 \usepackage{booktabs}
 \usepackage{amsfonts}                                                                   
 \usepackage{amssymb}                                                                    
+\usepackage{amsmath}
 \usepackage{verbatim}                                                                    
 \usepackage{listings}
 \usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.                            
@@ -21,8 +22,11 @@
 \usepackage{etoolbox}                                                                   
 \usepackage{pdfpages}                                                                   
 \usepackage{tikz,pgfplotstable}                                                         
-\usetikzlibrary{shapes,arrows,positioning}
+\usetikzlibrary{calc,matrix,chains,shapes,arrows,positioning}
 \usepackage{pgfgantt}                                                                   
+\usepackage{units}
+\usepackage{ifthen}
+\usepackage{multicol}
 \usepackage{neuralnetwork}                                                              
 \pgfplotsset{compat=1.13}                                                               
 \usepackage{caption}                                                                    
@@ -34,9 +38,20 @@
 
 \usepackage[parfill]{parskip}
 
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks,
+    linkcolor={blue!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
 %% PER MODIFICAR EL QUE OCUPA EL TEXT EN EL DOCUMENT:                                                 
 \usepackage[a4paper, total={15.4cm, 24cm}]{geometry}                                                  
 \geometry{top=3cm}                                 
+
+%\renewcommand{\familydefault}{\sfdefault}
 
 %% PER TREURE L'ESPAIAT DELS CHAPTERS:             
 \makeatletter                                      
@@ -72,19 +87,111 @@
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
 
+%% PER LES IMATGES A LA CAPÇALERA:
+\newsavebox{\mygraphic}
+\sbox{\mygraphic}{\transparent{0.7}\includegraphics[keepaspectratio,
+ width=0.15\textwidth]{./figures/telecom.jpg}}
+
+\newsavebox{\mygraphicupc}
+\sbox{\mygraphicupc}{\transparent{0.7}\includegraphics[keepaspectratio, width=0.25\textwidth]{./figures/upc.png}}
+
+\fancypagestyle{plain}{
+\fancyhead{}
+\renewcommand{\headwidth}{0pt}
+\fancyhead[R]{
+\begin{picture}(0,0)
+\put(400,0){\usebox{\mygraphic}}
+\end{picture}}
+\fancyhead[L]{
+\begin{picture}(0,0)
+\put(0,0){\usebox{\mygraphicupc}}
+\end{picture}}
+}
+
+\lhead[\begin{picture}(0,0)
+\put(0,0){\usebox{\mygraphicupc}}
+\end{picture}]{\begin{picture}(0,0)
+\put(0,0){\usebox{\mygraphicupc}}
+\end{picture}}
+
+\rhead[\begin{picture}(0,0)
+\put(-30,0){\usebox{\mygraphic}}
+\end{picture}]{\begin{picture}(0,0)
+\put(-30,0){\usebox{\mygraphic}}
+\end{picture}}
+\renewcommand{\headrulewidth}{0pt}
+
 \pagestyle{fancy}                                                                                                                                                                                           
 
+\usepackage{setspace}
 
 \begin{document}
 
+\begin{titlepage}
+
+	\begin{center}
+		% University logo
+		\begin{figure}[htb]
+		\centering
+			\includegraphics[width=1\textwidth]{figures/logo_upc.png}
+		\end{figure}
+
+		\vspace{1cm}
+
+        % Words for the title: "transfer learning", "domain adaptation", "convolutional networks"
+
+		% Title
+                %\textbf{ \Huge Voice Conversion using \\ \vspace{0.3cm} Deep Learning } \\ %\vspace{0.5cm} for Cultural Event Recognition}\\
+                \textbf{ \Huge Paragraph and word embeddings \\ \vspace{0.3cm} for \\ \vspace{0.5cm} Expressive Speech Synthesis} \\ %\vspace{0.5cm} for Cultural Event Recognition}\\
+%		\rule{\textwidth}{0.5pt}
+%		\vspace{-2ex}
+%		\centering
+		%\vspace{1cm}
+		\vspace*{0.3in}
+		%\rule{120mm}{0.05mm}\\
+		%\rule{\textwidth}{0.03mm}\\
+		\vspace*{0.1in}
+		%subtitle
+		{\Large  Degree's Thesis \\Audiovisual Systems Engineering }\\
+		\vspace{5cm}
+		\begin{tabular}{ll}
+
+			% Student name
+			\large{\textbf{Author:}}	&
+			\large{German Gomez Bajo} \\
+
+			% Advisors' name
+			\large{\textbf{Advisors:}}	&
+			\large{Antonio Bonafonte and Santiago Pascual de la Puente} \\	
+			\vspace{1cm}
+		\end{tabular}
+
+		%Universities
+		\large{\textbf{Universitat Politècnica de Catalunya (UPC)}}\\
+		\large{\textbf{2016 - 2017}}\\
+	\end{center}
+\end{titlepage}
+
+\clearpage
+
+\doublespacing
+
+\input{0_abstract}
+\input{0_revision}
+
+\doublespacing
 \tableofcontents
 \listoffigures
+\listoftables
+%\singlespacing
 
-\input{1_introduction}
+%\input{1_introduction}
 \input{2_stateofart}
 \input{3_process}
 \input{4_evaluation_results}
 \input{5_budget}
+\input{6_conclusions}
+\input{annex}
 
 \bibliography{state_of_art}
 \bibliographystyle{plain}

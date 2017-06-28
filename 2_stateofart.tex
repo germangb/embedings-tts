@@ -56,16 +56,19 @@ Where $\rho$ is a weighting term that can be used to pay more attention to the t
 
 \subsection{Statistical Parametric Speech Synthesis}
 
-In statistical-parametric speech synthesis (SPSS) a set of spectral and excitation parameters are extracted from a speech corpus and then a statistical generative model (typically a hidden Markov model or HMM) is trained to model the them for use in speech synthesis.
+In statistical-parametric speech synthesis (SPSS) a set of spectral and excitation parameters are extracted from a speech corpus from where a set of statistical generative models (typically a hidden Markov model or HMM) are trained to model the them for use in speech synthesis.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[height=4cm]{figures/hmm}
+    %\includegraphics[height=4cm]{figures/hmm}
+
+    \input{figures/hmm}
+
     \caption{A 3-state left-to-right Hidden Markov Model.}
     \label{fig:hmm}
 \end{figure}
 
-As seen in Figure \ref{fig:hmm}, a HMM is a finite state machine that can be described by the tuple $\lambda = \left < A, B, \Pi \right >$ where $A$ are the state transition probabilities, $B$ are the output distributions on each state and $\Pi$ are the initial state probabilities (spectral \& excitation output parameters). HMMs are used as generative model since they provide a time-discrete series of observations from a distribution of the speech parameters. In contrast with unit selection, HMM based speech synthesis models offer a more compact representation than unit selection since they don't require a large database after the models have been trained.
+As seen in Figure \ref{fig:hmm}, a HMM is a finite state machine that can be described by the tuple $\lambda = \left < A, B, \Pi \right >$ where $A$ are the state transition probabilities, $B$ are the output distributions on each state (spectral \& excitation output parameters) and $\Pi$ are the initial state probabilities. HMMs provide a time-discrete series of observations from a distribution of the speech parameters. In contrast with unit selection, SPSS models offer a more compact representation than unit selection since they don't require a large database after the models have been trained.
 
 \begin{figure}
     \centering
@@ -74,43 +77,51 @@ As seen in Figure \ref{fig:hmm}, a HMM is a finite state machine that can be des
     \label{fig:hts}
 \end{figure}
 
-Moreover, it also overcomes the limitation of only being limited to one speaker, since we can easily modify the speaker characteristics and speaking styles by transforming the HMM parameters appropriately as describes in \cite{zen2007hmm}. 
+Moreover, SPSS also overcomes the limitation of only being limited to one speaker, since we can easily modify the speaker characteristics and speaking styles by transforming the model parameters appropriately as describes in \cite{zen2007hmm} and \cite{pascual2006deep}.
 
 %In the methodology chapter of this document, the concepts from this section will be revisited and explained more in-depth.
 
 \subsection{Recurrent Neural Network-based Speech Synthesis} \label{sec:rnn-tts}
 
 %RNNs
-Another approach to speech synthesis more closely related to the implementation of this project, is using recurrent neural networks (RNNs) to process a sequence of linguistic features to predict the same excitation and spectral parameters from SPSS.
+Another approach to speech synthesis more closely related to this project, is using recurrent neural networks (RNNs) to process a sequence of linguistic features and predict the same excitation and spectral parameters from SPSS.
 
 RNNs are covered in more detail in a later section of this chapter. As describes by \cite{chen1998rnn}, this scheme consists of using neural networks to generate parametric speech in two stages: a duration model that predicts the duration of a phoneme in a sentence, and an acoustic model to predict the spectral and excitation parameters for as many time steps as predicted by the duration model. Figure \ref{fig:rnn-tts-0} shows the complete scheme of this approach.
 
 \begin{figure}[h]
 \centering
-    \includegraphics[height=16cm]{figures/rnn-tts}
-    \caption{RNN-based SPSS scheme. Concepts such as LSTM that appear in the figure are covered at later section of this chapter.}
+    \includegraphics[height=13cm]{figures/rnn-tts}
+    \caption{RNN-based SPSS scheme. Concepts such as LSTM that appear in the figure are covered at later section of this chapter. The figure is originally from \cite{chen1998rnn}}
     \label{fig:rnn-tts-0}
 \end{figure}
 
-\subsection{Expressive}
+\subsection{Expressive speech synthesis}
 
-Summary of the bibliography of the approaches to expressive speech synthesis.
+%Summary of the bibliography of the approaches to expressive speech synthesis.
+%Expressive speech synthesis
+The techniques from the previous sections for doing speech synthesis typically only offer a single speaking style that is independent of the message that is being transmitted. In \cite{bulut2002expressive} and \cite{eide2004corpus} a prosodic target is modeled in order to synthesize a text with different types of emotions using a unit selection systems and pitch prediction to modify the prosodic content of the speech.
+
+More recently, \cite{jauk2016acoustic} uses deep neural networks (more on this in the following sections) to predict acoustic features of expressive speech from semantic vector space representations. The results can be used to enhance the inputs of speech synthesis systems by modeling the expressiveness of a corpus in SPSS systems, which in contrast with \cite{bulut2002expressive} and \cite{eide2004corpus}, the synthesis would adapt to the semantic content of the message.
 
 \section{Text classification for sentiment Analysis}
 
+Text classification is a task in natural language processing \cite{chowdhury2003natural} (NLP) where a text is assigned a given label automatically. A classic model used for text classification is bag of words \cite{wallach2006topic} (BOW), where a piece of text is assumed to be a sequence of words picked at random from a specific set. In the topic of text classification, classifying text using BOW would involve predicting the set the text belongs to (for example, a SPAM email contains specific words common to all SPAM emails, or a positive text may contain words that are different from a negative text).
+
+More recently, more modern techniques such as deep learning have been used to improve the accuracy of these systems. In \cite{zhang2015character} text is treated as a signal an processed using Convolutional neural networks (more on this in the next sections) and \cite{DBLP:journals/corr/Kim14f} uses vector representations of words (word embeddings \cite{goldberg2014word2vec}) to classify text.
+
 %Introduction to the sentiment or text classification task.
 
-\section{Deep Learning}
+\section{Deep Learning} \label{sec:dnn}
 
 In recent years, deep structured learning, or more commonly called deep learning is a set of techniques that has risen in popularity and established itself as a new area of machine learning among the scientific and research communities. \cite{deng2014deep}
 
 \cite{bengio2009learning} discussed the limitations of shallow architectures and provided a theoretical basis to the advantages of deeper ones. But it has only been in recent years that such architectures have been able to be put into production with ever-growing popularity thanks to compute technologies being every time more available and affordable to consumers.
 
-With deep learning architectures, it is possible to learn complex non-linear representations from large amounts of data. Raw data can be processed and turned into several levels of higher level representations to make it possible to reason about them and make tasks such as classification easier and more effective.
+With deep learning architectures, it is possible to learn complex non-linear representations from large amounts of data. Raw data can be processed and turned into several levels of higher level representations to make it possible to reason about it and make tasks such as classification easier and more effective.
 
 In addition to more compute power, large datasets that can take advantage of deep models such Imagenet \cite{russakovsky2015imagenet} are being made publicly available. These datasets are often used as benchmarks and serve as points of reference to drive research and development forward.
 
-In summary, one could describe Deep Learning as models capable of obtaining high level information from low level one, and the compute resources and databases that make training of these models possible.
+%In summary, one could describe Deep Learning as models capable of obtaining high level information from low level one, and the compute resources and databases that make training of these models possible.
 
 \subsection{Deep Neural Networks}
 
@@ -118,24 +129,14 @@ In Deep Learning, a common architecture is the so called Deep Neural Network (DN
 
 \begin{figure}[h]
     \centering
-    
-    \begin{tikzpicture}
-        \foreach \x in {0,...,4} {
-            \foreach \y in {0,...,4} {
-                \draw(0,\x * 0.75) -- (2,\y * 0.75);
-            }
-        }
-        \foreach \x in {0,...,4} {
-            \draw[fill=white](0,\x * 0.75) circle(0.3);
-            \draw[fill=white](2,\x * 0.75) circle(0.3);
-        }
-    \end{tikzpicture}
-
-    \caption{Neural network basic configuration. Each layer consists of a net of nodes chich perform a linear operation of the inputs, before being fed to an activation function at the output and fed to the next layer.}
+    \scalebox{.75} { \input{network} }
+    \scalebox{.5} { \input{neuron} }
+    %\caption{Neural network basic configuration. Each layer consists of a net of nodes chich perform a linear operation of the inputs, before being fed to an activation function at the output and fed to the next layer.}
+    \caption{Basic neuron (left) and neural network configuration (right).}
     \label{fig:neural-net}
 \end{figure}
 
-DNNs are defined by stacking several layers of basic units called neurons. In each layer, a linear operation takes place, where the inputs $\mathbf{x}= \left \{ 1, x_1, x_2, ..., x_N \right \}$ ($1$ is for a bias term) are linearly combined by a set of weights that are characteristic of each layer. The output of this linear operation is fed to a non-linear activation function (such as a sigmoid (\ref{eq:sigmoid}) or a tanh) which introduces the non-linearities of the system and is differentiiable (property that will be relevant for optimizing or training the weights). Equation \ref{eq:neural-layer} shows the operation that takes place in the $i$-th layer, where $\mathbf{W_i}$  is the matrix of weights, $\mathbf{x_i}$ is the input vector of the layer, $\mathbf{y_i}$ is the output vector and $\sigma$ is the activation function.
+DNNs are defined by stacking several layers of basic units called neurons. In each layer, a linear operation takes place, where the inputs $\mathbf{x}= \left \{ 1, x_1, x_2, ..., x_N \right \}$ ($1$ is for a bias term) are linearly combined by a set of weights that are characteristic of each layer. The output of this linear operation is fed to a non-linear activation function (such as a sigmoid (\ref{eq:sigmoid}) or a tanh) which introduces the non-linearities of the system. Equation \ref{eq:neural-layer} shows the operation that takes place in the $i$-th layer, where $\mathbf{W_i}$  is the matrix of weights, $\mathbf{x_i}$ is the input vector of the layer, $\mathbf{y_i}$ is the output vector and $\sigma$ is the activation function.
 
 \begin{equation}
     \centering
@@ -154,10 +155,12 @@ The outputs of this activation function are fed to the next layer of neurons unt
 \subsection{Optimization}
 
 %Back propagation algorithm and optimizers.
-Optimizing, or training, a DNN is the process of finding the best possible set of weights that accomplish the best results in a given task. A task that DNNs are used for is classification, where a label is assigned to each input vector (predicting the wether an image is from a cat or a dog) and also regression (predicting the expected cost of a property given the land size and proximity to the coast).
+Optimizing, or training, a DNN is the process of finding the best possible set of weights that accomplish the best results in a given task. A task that DNNs are used for is classification, where a label is assigned to each input vector (predicting wether an image is from a cat or a dog) and also regression (predicting the expected cost of a property given the land size and proximity to the coast).
+
+To optimize the network a cost or loss function is defined to measure the error of the predictions (such as the root mean square error or the cross-entropy error \cite{golik2013cross}). given a loss, we can improve the performance of a model by translating the weight vector in the direction of the gradient.
 
 \begin{equation}
-    L(\mathbf{x}; \mathbf{w}) = \sum_{\mathbf{x}_k}^{} L_i (\mathbf{x_k})
+    L(\mathbf{x}; \mathbf{w}) = \sum_{\mathbf{x}_k}^{} L (\mathbf{x_k})
     \label{eq:loss}
 \end{equation}
 
@@ -166,13 +169,11 @@ Optimizing, or training, a DNN is the process of finding the best possible set o
     \label{eq:update_w}
 \end{equation}
 
-To optimize the network a cost or loss function is defined to measure the error of the predictions (such as the root mean square error or the cross-entropy error \cite{golik2013cross}). given a loss, we can find improve the performance of a model by translating the weight vector of the model in the direction of the gradient.
+Equation \ref{eq:loss} is a loss function, computed by adding the errors of a batch of vectors of a dataset. These vectors are the examples from where the network learns. The size of the batch is usually fixed and smaller than the total size of the dataset, and is used to perform an iteration in the weight update process (Equation \ref{eq:update_w}). This technique is called stochastic gradient descent \cite{bottou2010large} (SGD).
 
-Equation \ref{eq:loss} is a general loss function, computed by adding the errors of a batch of vectors of a dataset. These vectors are the examples from where the network learns. The size of the batch is usually fixed and smaller than the total size of the dataset, and is used to perform an iteration in the weight update process (Equation \ref{eq:update_w}). This technique is called stochastic gradient descent \cite{bottou2010large} (SGD).
+Before updating the weights, the partial derivatives of the loss function are computed using the back-propagation algorithm \cite{chauvin1995backpropagation}. For this we need to be able to compute the derivatives of both the loss function and the activation functions of the neurons, and the update is performed like in Equation \ref{eq:update_w}.
 
-Before updating the weights, the partial derivatives of the loss function are computed using the back-propagation algorithm \cite{chauvin1995backpropagation}. For this we need to be able to compute the derivatives of both the loss function and the activation functions of the neurons.
-
-After computing the derivatives, the norm of the gradient can be scaled by a factor called learning rate (expressed as $\lambda$ in Equation \ref{eq:update_w}) that can be used to speed-up or slow-down the convergence of the loss function during training. Other ways to improve this update are Adam \cite{kingma2014adam} and Adadelta \cite{zeiler2012adadelta}.
+The norm of the gradient can be scaled by a factor called learning rate (expressed as $\lambda$ in Equation \ref{eq:update_w}) to speed-up or slow-down the convergence of the loss function during training. Ways to improve this weight updates are Adam \cite{kingma2014adam} and Adadelta \cite{zeiler2012adadelta}.
 
 %\begin{figure}
 %    \centering
@@ -192,13 +193,13 @@ Recurrent neural networks (RNN) are a special type of architecture capable of mo
 
 \begin{equation}
     \centering
-    \mathbf{y_t} = \sigma \left ( \mathbf{W} \cdot \mathbf{x_t} + \mathbf{U_t} \cdot \mathbf{y_{t-1}} \right )
+    \mathbf{y_t} = \sigma \left ( \mathbf{W} \cdot \mathbf{x_t} + \mathbf{U} \cdot \mathbf{y_{t-1}} \right )
     \label{eq:out-rec}
 \end{equation}
 
-Where $\mathbf{x}[n]$ is an input vector at the $n$-th timestep and $\mathbf{U_i}$ is an additional set of tranable weights. Because of the introduction of a neuron state, RNNs can model various types of sequential data (predict the next frame of a video given the N first, translate a sequence of words to another a different language, predict the duration of each of the phonemes in a sequence, etc...).
+Where $\mathbf{x_t}$ is an input vector at the $t$-th timestep and $\mathbf{U}$ is an additional matrix of tranable weights. Because of the introduction of a neuron state, RNNs can model various types of sequential data (predict the next frame of a video given the N first, translate a sequence of words to another a different language, predict the duration of each of the phonemes in a sequence, etc...).
 
-Recurrent networks can still be trained efficiently by using back-propagation through time \cite{werbos1990backpropagation} which is specific case of back-propagation where the errors are also back-propagation back in time in the same ways that they are propagated backwards from the outputs to the inputs of the network. If we expand \ref{eq:out-rec} we get:
+Recurrent networks can still be trained efficiently by using back-propagation through time \cite{werbos1990backpropagation} which is specific case of back-propagation where the errors are also back-propagation back in time. If we expand \ref{eq:out-rec} we get:
 
 \begin{figure}
     \centering
@@ -209,22 +210,30 @@ Recurrent networks can still be trained efficiently by using back-propagation th
 
 \begin{equation}
     \centering
-    \mathbf{y_t} = \sigma \left ( \mathbf{W} \cdot \mathbf{x_t} + \mathbf{U_t} \cdot \sigma \left ( \mathbf{W} \cdot \mathbf{x_{t-1}} + \mathbf{U_{t-1}} \cdot \sigma \left ( \cdots \sigma \left ( \cdots \right ) \cdots \right ) \right ) \right )
+    \mathbf{y_t} = \sigma \left ( \mathbf{W} \cdot \mathbf{x_t} + \mathbf{U} \cdot \sigma \left ( \mathbf{W} \cdot \mathbf{x_{t-1}} + \mathbf{U} \cdot \sigma \left ( \cdots \sigma \left ( \cdots \right ) \cdots \right ) \right ) \right )
     \label{eq:out-rec-expanded}
 \end{equation}
 
 The recursive multiplication of $U_t$ make RNNs a special case of DNNs, where the repeated multiplications can cause the gradients to become too small or too big by the time they reach the inputs of the network when doing back-propagation. This is due to the vanishing or exploding gradient problem \cite{bengio1994learning} that occurs in SGD.
 
-To mitigate this problem in RNNs, we can use specially designed recurrent neurons such as Long Short-Term Memory as upposed to regular RNNs.
+To mitigate this problem in RNNs, we can use specially designed recurrent neurons such as Long Short-Term Memory as opposed to regular RNNs.
 
 \subsection{Long Short-Term Memory (LSTM)}
 
-Long Short-Term Memory \cite{hochreiter1997long} or LSTM are a special kind of recurrent unit that deals with the aforementioned problem of the vanishing gradient. This cell works by introducing gating mechanism operated by soft switches than are trained while optimizing the network to control the flow of information coming in and out of the cell. Figure \ref{fig:lstm}
+Long Short-Term Memory \cite{hochreiter1997long} or LSTM are a special kind of recurrent unit that deals with the aforementioned problem of the vanishing gradient. This cell works by introducing gating mechanism operated by soft switches trained while optimizing the network that control the flow of information coming in and out of the cell.
 
+\begin{comment}
 \begin{figure}[h]
     \centering
     \includegraphics[height=4cm]{figures/lstm-chain}
-    \caption{Diagram of a chain of LSTM units. The horizontal axis represents time and the vertical represents the RNN-LSTM at each timestep. $X_t$ are the input vectors at the past, present and future timestep. The gating mechanism controls the flow of information that is input to the next state of the layer. This ffigure was taken from \cite{lstm}}
+    \caption{Diagram of a chain of LSTM units. The horizontal axis represents time and the vertical represents the RNN-LSTM at each time step. $X_t$ are the input vectors at the past, present and future time step. The gating mechanism controls the flow of information that is input to the next state of the layer. This figure was taken from \cite{lstm}}
     \label{fig:lstm}
 \end{figure}
+\end{comment}
+
+\section{Convolutional Neural Networks}
+
+As seen in Equation \ref{eq:neural-layer}, a neuron activation depends on all the output activation of the previous layer. Convolutional neural networks (CNN) are a type of architecture that contain a type of hidden layers called Convolutional layers. These architectures have proven to be very effective in computer vision applications but they are also used with success in NLP tasks \cite{zhang2015character}.
+
+Rather than combining all the outputs of the previous layer, CNN neurons only focus on the activations of a fixed number of neurons from the previous layer \cite{krizhevsky2012imagenet}. While each neuron focuses on a different set of inputs, the total number is fixed and the weights are shared among the activations of the layer. Because of this, we can think of these layers as having an associated kernel that is used to filter the previous layer by means of a convolution to produce a feature map in the layer. The number of feature maps is a parameter of the convolutional layer. %By stacking these layers, the deepest layers can learn very speciliced filters from low level features learnt in the earlier layers (for example a filter that detects faces in a picture, deppends on a filter that detects straight and round edges), making these architectures very popular in computer vision tasks.
 

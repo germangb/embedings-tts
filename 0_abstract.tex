@@ -1,0 +1,17 @@
+\chapter*{Abstract}
+
+In this project we attempt to enhance the features of a statistical parametric speech synthesis (SPSS) system based on long short-term memory recurrent neural networks (RNN-LSTM) in order to be able to perform better with an expressive corpus.
+
+The corpus that was used came from the Blizzard challenge \cite{blizzard} and contains roughly 20 hours of audiobooks along with the transcripts. In order to obtain the expressive features (embeddings) we train a convolutional neural network (CNN) to predict how good or bad a sentence is using text from the Stanford Sentiment Treebank \cite{socher2013recursive} dataset, and transfer its mapping function afterwards to a second CNN that works with the waveforms of the Blizzard corpus.
+
+We perform an additional adaptation task to the network that works with text in order to adapt it to the Blizzard corpus, because the two datasets contain different semantic content.
+
+Various experiments have been carried out to find the set of expressive features that give the best objective and subjective results (including a baseline) by means of an evaluation done by TODO volunteers.
+
+TODO results
+
+%\chapter*{Resum}
+
+%\chapter*{Resumen}
+
+\chapter*{Acknowledgements}
