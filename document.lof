@@ -9,14 +9,17 @@
 \contentsline {figure}{\numberline {2.2}{\ignorespaces Full utilization of system resources by Ahocoder. Memory and CPU usage are close to their limits.\relax }}{22}{figure.caption.18}
 \contentsline {figure}{\numberline {2.3}{\ignorespaces $F_0$ contour interpolation\relax }}{24}{figure.caption.19}
 \contentsline {figure}{\numberline {2.4}{\ignorespaces Training table used to train the acoustic model is stored in the server disk.\relax }}{24}{figure.caption.20}
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Label representation of the phrase "the autobiography of a horse."\relax }}{26}{figure.caption.21}
-\contentsline {figure}{\numberline {2.6}{\ignorespaces Ogmios modules used to predict phoneme duration.\relax }}{26}{figure.caption.22}
-\contentsline {figure}{\numberline {2.7}{\ignorespaces Histogram of the phoneme duration predictions by Ogmios.\relax }}{28}{figure.caption.23}
-\contentsline {figure}{\numberline {2.8}{\ignorespaces Configuration example for the baseline system. Some options have been omitted.\relax }}{29}{figure.caption.24}
-\contentsline {figure}{\numberline {2.9}{\ignorespaces Example of sentence tree corresponding to the sentence "Effective but too-tepid biopic"\relax }}{31}{figure.caption.25}
-\contentsline {figure}{\numberline {2.10}{\ignorespaces Text classification architecture. The figure is originally from \cite {DBLP:journals/corr/Kim14f}\relax }}{31}{figure.caption.26}
-\contentsline {figure}{\numberline {2.11}{\ignorespaces Distribution of sentence lengths in the Stanford sentiment treebank dataset.\relax }}{33}{figure.caption.28}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Label representation of the phrase "the autobiography of a horse."\relax }}{27}{figure.caption.21}
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Histogram of the phoneme duration predictions by Ogmios.\relax }}{28}{figure.caption.22}
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Configuration example for the baseline system. Some options have been omitted.\relax }}{29}{figure.caption.23}
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Example of sentence tree corresponding to the sentence "Effective but too-tepid biopic"\relax }}{31}{figure.caption.24}
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Text classification architecture. The figure is originally from \cite {DBLP:journals/corr/Kim14f}\relax }}{32}{figure.caption.25}
+\contentsline {figure}{\numberline {2.10}{\ignorespaces Distribution of sentence lengths in the Stanford sentiment treebank dataset.\relax }}{34}{figure.caption.27}
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Training and validation curves of the sentiment analysis task.\relax }}{37}{figure.caption.30}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Duration model's training curves\relax }}{38}{figure.caption.32}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Acoustic model's training curves\relax }}{39}{figure.caption.33}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Screenshot of the subjective evaluation's web application.\relax }}{40}{figure.caption.34}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

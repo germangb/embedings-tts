@@ -1,14 +1,16 @@
 \chapter*{Abstract}
 
-In this project we attempt to enhance the features of a statistical parametric speech synthesis (SPSS) system based on long short-term memory recurrent neural networks (RNN-LSTM) in order to be able to perform better with an expressive corpus.
+This project attempts to enhance the features of a statistical parametric speech synthesis (SPSS) system based on long short-term memory recurrent neural networks (RNN-LSTM) in order to be able to perform better with an expressive corpus. We used the Blizzard Challenge \cite{blizzard} text-to-speech corpus to train the speech synthesis. This corpus was chosen because of its richness in expressive content.
 
-The corpus that was used came from the Blizzard challenge \cite{blizzard} and contains roughly 20 hours of audiobooks along with the transcripts. In order to obtain the expressive features (embeddings) we train a convolutional neural network (CNN) to predict how good or bad a sentence is using text from the Stanford Sentiment Treebank \cite{socher2013recursive} dataset, and transfer its mapping function afterwards to a second CNN that works with the waveforms of the Blizzard corpus.
+The first part of of the project was to develop a baseline speech sythesizer from \cite{pascual2016deep}. This architecture is based on RNN-LSTMs where the inputs are a vector of linguistic features and the output are speech parameters that are fed to a vocoder (we used Ahocoder \cite{vocoder_ah} for this project) to reconstruct the waveform from the synthesized speech.
 
-We perform an additional adaptation task to the network that works with text in order to adapt it to the Blizzard corpus, because the two datasets contain different semantic content.
+The second part of the project was to develop a sentiment analysis classifier based on convolutional neural networks (CNN), that predicts how good or bad a given sentence is. This classifier was trained with a dataset from the Stanford sentiment treebank \cite{socher2013recursive}, which consists of movie reviews.
+
+To obtain the expressive features that would allow for expressive speech to be synthesized, another CNN was trained using the Blizzard corpus to adapt the domain of the sentiment analysis network to the one from the synthesized speech. In the end, we use the activations from one of the layers from the sentiment analysis network as expressive embeddings and use them as inputs for the speech synthesizer.
 
 Various experiments have been carried out to find the set of expressive features that give the best objective and subjective results (including a baseline) by means of an evaluation done by TODO volunteers.
 
-TODO results
+%TODO results
 
 %\chapter*{Resum}
 
