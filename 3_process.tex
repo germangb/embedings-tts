@@ -1,13 +1,13 @@
-\chapter{Expressive Speech synthesis}
+\chapter{Baseline speech synthesis}
 
 %This chapter explain how the project was carried out
 %In this chapter of the document, the development process that has been followed in order to complete this project is explained.
 
-This chapter explains how the project was developed. The methodologies and technologies that were used during this project are also discussed.
+%This chapter explains how the baselin was developed. The methodologies and technologies that were used during this project are also discussed.
 
 \section{Baseline development}
 
-The first stage of this project was to develop a baseline speech synthesizer. This model is used as a reference when comparing the results of the subsequent experiments explained in later sections of this chapter. The architecture is based on the work done by \cite{pascual2006deep} by using the Socrates Text-to-speech framework, which is based on the Keras deep learning library. This is a RNN-LSTM based model, which, as mentioned in section \ref{sec:rnn-tts}, contains a duration model and an acoustic model which are trained independently.
+The first stage of this project was to develop a baseline speech synthesizer. This model is used as a reference when comparing the results of the experiments explained in the evaluation chapter. The architecture is based on the work done by \cite{pascual2016deep} by using the Socrates Text-to-speech framework developed in the VEU research group at UPC, which is based on the Keras deep learning library. This is a RNN-LSTM based model, which, as mentioned in section \ref{sec:rnn-tts}, contains a duration model and an acoustic model which are trained independently.
 
 \tikzstyle{layer} = [rectangle, draw, fill=blue!20, text centered, minimum width=19em, minimum height=2em]
 
@@ -46,11 +46,11 @@ The first stage of this project was to develop a baseline speech synthesizer. Th
 %In the following subsections we go in more detail into each of the shown modules from Figure \ref{fig:sys}. The explanations are not a special case of the baseline system but they are also relevant for the final system with the added expressiveness features from the other sections of this chapter.
 %The following sections explain how the data that is used to train this architecture is obtained from our speech corpus.
 
-\subsection{Data preparation}
+\section{Data preparation}
 
 %The developed speech synthesizer is an RNN-based architecture similar to the one presented in chapter 2. As mentioned in that section, the architecture from the baseline system is composed of two sections: a duration model and an acoustic model. It is important to note that this system does not produce the output waveform directly but instead it produces spectral and excitation coefficients like in SPSS based systems. This means that the speech database that we use will have to be processed in order to train the system.
 
-The corpus that has been used for this project contains approximately 20 hours or several audiobooks along with the transcripts. The data came from the Blizzard challenge \cite{blizzard} and is already segmented at the utterance level, removing the need to align the whole audio stream with the raw text data. The reason we chose this corpus is because of its richness in expressive content. Table \ref{tab:blizard} shows some information about the audio files that we get from it.
+The corpus that has been used for this project contains approximately 20 hours or audiobooks along with the transcripts. This corpus was originally produced for the Blizzard challenge \cite{blizzard} and is already segmented at the utterance level, removing the need to align the whole audio stream with the raw text data. The reason we chose this corpus is because of its richness in expressive content. Table \ref{tab:blizard} shows some information about the audio files that we get from it.
 
 % table with audio information (Sampling, bit depth, channels, etc...)
 \begin{table}[h]
@@ -71,47 +71,49 @@ The corpus that has been used for this project contains approximately 20 hours o
 
 %Every speech waveform is decoded at a frame level by using a vocoder using a sliding window that advances 5 milliseconds between consecutive windows. The vocoder that we used for this project is Ahocoder, an Harmonics plus Noise Model that is described in detail at \cite{vocoder_ah}. In Figure \ref{fig:wav-prep} it is shown how each utterance is processed.
 
-\subsection{Obtaining Acoustic features} \label{sec:aco-features}
+\section{Obtaining Acoustic features} \label{sec:aco-features}
 
-As mentioned in section \ref{sec:rnn-tts}, this RNN based speech synthesizer is a SPSS case and as such it doesn't output the waveforms directly but the excitation and spectral parameters before they are reconstructed by a vocoder. The vocoder that we used is Ahocoder \cite{vocoder_ah}.
+As mentioned in section \ref{sec:rnn-tts}, this RNN based speech synthesizer is based on SPSS and as such it doesn't output the waveforms directly but the excitation and spectral parameters before they are reconstructed by a vocoder. The vocoder that we used is Ahocoder \cite{vocoder_ah}.
 
 Every audio file is framed by means of a sliding window with a stride of 5 milliseconds. Ahocoder then processes each frame to produce a set of excitation and spectral parameters which are:
 
 \begin{itemize}
-    \item{Mel Frequency Cepstral Coefficients (MFCC) of order $p = 39$, which corresponds to $40$ coefficients.}
-    \item{Pitch contour ($log(F_0)$). Unvoiced frames correspond to $F_0 = 0$ value of $-\inf$ after the logarithm. Ahocoder outputs a value of $-10^8$ when the frame is unvoiced.}
+    \item{Mel Frequency Cepstral Coefficients (MFCC) of order $p = 39$, which corresponds to $40$ coefficients. This represents the information from the speech formants.}
+    \item{Pitch contour ($log(F_0)$). Unvoiced frames correspond to $F_0 = 0$. Ahocoder outputs a value of $-10^8$ when the frame is unvoiced.}
     \item{Maximum voiced frequency ($fv$), This value is 0 when a frame is unvoiced.}
-    \item{Voiced/Unvoiced (UV) flag. This value indicates if a given frame of audio corresponds to a voiced or unvoiced sound and can be obtained using the $fv$ or $log(f0)$ outputs of Ahocoder. This flag is not directly output by the Ahocoder.}
+    \item{Voiced/Unvoiced (UV) flag. This value indicates if a given frame of audio corresponds to a voiced or unvoiced sound and is obtained using the $log(F_0)$ output of Ahocoder.}
 \end{itemize}
 
-To perform this data extraction from the Blizzard corpus, the Python and Bash scripting languages were used to parallelize the whole process. The basic unit of work of this step is to spawn an Ahocoder decoder process with the path of the file, and save the speech parameters that it generates to disk. Because this operation is single threaded, and because of the large amount of data that we had in the Blizzard Challenge dataset (20 hours of speech), this process was parallelized in order to fully utilize the computing resources of the server. This involved writing two scripts:
+To perform this data extraction from the Blizzard corpus, the Python and Bash scripting languages were used to parallelize the whole process. The basic unit of work of this step is to spawn an Ahocoder process with the path of the file, and save the speech parameters that it generates to disk. Because this operation is single threaded, and because of the large amount of data that we had in the Blizzard Challenge dataset (20 hours of speech), this process was parallelized in order to fully utilize the computing resources of the server. This involved writing two scripts:
 
 \begin{itemize}
     \item \textbf{split\_names.py} is a Python script that takes a list of files (All the filenames from the Blizzard corpus) and splits it into smaller chunks.
     \item \textbf{process\_ahocode.sh} is a Bash script that reads a list of files and processes each of them through Ahocode and saves the speech parameters to the disk.
 \end{itemize}
 
-The filenames of the corpus was split into 30 chunks (the server has 32 CPUs) using the \textbf{split\_names.py} script and each of the chunks was processed by \textbf{process\_ahocode.sh}. Using this method inspired by \cite{pascual2016deep} this whole data preparation process was accomplished in less than one hour fully utilizing the system resources as seen in Figure \ref{fig:aho-load}.
+The filenames of the corpus was split into 30 chunks (the server has 32 CPUs) using the \textbf{split\_names.py} script and each of the chunks was processed by \textbf{process\_ahocode.sh}. Using this method inspired by \cite{pascual2016deep} this whole data preparation process was accomplished in less than one hour fully utilizing the system resources.
 
+\begin{comment}
 \begin{figure}
     \centering
     \includegraphics[width=15cm]{figures/ahoload}
     \caption{Full utilization of system resources by Ahocoder. Memory and CPU usage are close to their limits.}
     \label{fig:aho-load}
 \end{figure}
+\end{comment}
 
-\subsection{Acoustic feature normalization}
+\section{Acoustic feature normalization}
 
-The data is not used as it is output by the Ahocoder directly. These acoustic predictors are normalized before they are used to train the acoustic model for a good behavior of the back-propagation algorithm, as discussed in \cite{pascual2016deep}.
+The data is not used as it is at the output of the Ahocoder directly. These acoustic predictors are normalized before they are used to train the acoustic model for a good behavior of the back-propagation algorithm, as discussed in \cite{pascual2016deep}.
 
-The outputs of the Ahocoding process ($MFCC$, $log(f_0)$ and $f_v$) was normalized so that the speech parameters are bound between a minimum and a maximum value range. This range is chosen to be ${0.01, 0.99}$. The normalization of the acoustic outputs is shown in equation \ref{eq:out-norm}
+The outputs of the Ahocoding process ($MFCC$, $log(f_0)$ and $f_v$) were normalized so that they were bound between a minimum and a maximum value range. This range is chosen to be ${0.01, 0.99}$. The normalization of the acoustic outputs is shown in equation \ref{eq:out-norm}
 
 \begin{equation}
     \hat{y} = 0.01 + (0.99 - 0.01) \frac{y - y_{min}}{y_{max} - y_{min}}
     \label{eq:out-norm}
 \end{equation}
 
-This doesn't work for the $log(F_0)$ features however, since their high dynamic range would compress the values from the viced frames too much. \cite{pascual2016deep} solves it by keeping the values from the voiced frames and interpolating the values in the unvoiced regions as shown in Equation \ref{eq:linear-f0}:
+This doesn't work for the $log(F_0)$ features however. Because Ahocoder outputs a value of $-10^8$ when a frame is not voiced, equation \eqref{eq:out-norm} would compress the values from the voiced frames too much. \cite{pascual2016deep} solves it by keeping the values from the voiced frames and interpolating the values in the unvoiced regions as shown in Equation \ref{eq:linear-f0}:
 
 \begin{equation}
     log F_0^i = log F_0^p + (log F_0^n - log F_0^p) \cdot \frac{i-p}{n-p}
@@ -120,7 +122,7 @@ This doesn't work for the $log(F_0)$ features however, since their high dynamic 
 
 Where $n$ is the next voiced frame's frame index, $F_0^n$ is the next voiced frame's first value, p is the previous voiced value's frame index, $F_0^p$ is the previous voiced value and $F_0^i$ is the $i$-th new interpolated value to be replaced in the original output of the Ahocoding process (Figure \ref{fig:f0-int} has an example of this interpolation). We can then use the UV flag to recover the original format after denormalization and reconstruct the waveform.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=12cm]{figures/f0.png}
     \caption{$F_0$ contour interpolation}
@@ -149,14 +151,14 @@ These acoustic features are used to train the acoustic model of the system. The 
 
 Which are the examples that are used to train the acoustic model. Some of the inputs are repeated depending on the duration of the phonemes (the linguistic features are explained in the next section). To create these tables, another python script \textbf{gen\_aco\_tables.py} was written for the project. This script reads a list of files corresponding to the single sentences from the Blizzard corpus and does the following:
 \begin{enumerate}
-    \item Reads the file of acoustic features (explained in the next section) containing both the phonetic segmentation and the phoneme durations.
+    \item Reads the file of linguistic features (explained in the next section) containing both the phonetic segmentation and the phoneme durations.
     \item Reads the corresponding acoustic features from Ahocoder (obtained in the previous section) and writes a line containing: the vector of linguistic features, the log normalized duration of the phoneme, the relative position of the ahocoder window within the current phoneme, and the vector of acoustic features ($MFCC$, $log(f_0)$, $f_v$ and $UV$). This line in repeated for as many windows the phoneme lasts (modifying the relative duration value every line). At the end there might be a remainder duration error because the number of windows the phoneme lasts might not be an integer number. This remainder is carried to the next phoneme.
     \item Once all the data has been collected, the values are normalized and written to disk for use in Socrates.
 \end{enumerate}
 
-We execute this script for both the training data, the test data and the validation data. These can be done in parallel but it is not as critical as obtaining the acoustic parameters.
+We execute this script for both the training data, the test data and the validation data. These can be done in parallel but it is not as critical.
 
-\subsection{Obtaining linguistic features} \label{sec:ling-feat}
+\section{Obtaining linguistic features} \label{sec:ling-feat}
 
 Each of the audio transcriptions was transformed into a lower level phonetic representation called Label that contains a set of both real and categorical descriptors with information about each phoneme and its context within a sentence. Table \ref{tab:lab-format} contains a description of the values that are included in this representation.
 
@@ -244,37 +246,38 @@ j1* & number of syllables in this utterance \\
 j2* & number of words in this utterance \\
 j3* & number of phrases in this utterance \\
 \bottomrule
-\caption{\label{table:lab_format}Label format.}\\
+\caption{\label{table:lab_format}Label format. The symbols tagged with an asterisk reference the future context of the phoneme.}\\
+\label{tab:lab-format}
 \end{longtable}
 \doublespacing
 
 
-A full example of this conversion is shown in \ref{fig:sentence-lab}:
+A full example of this conversion is shown in Figure \ref{fig:sentence-lab}:
 
 \begin{figure}[h]
 \begin{lstlisting}[basicstyle=\tiny,frame=single]
-pau^D-i+O:=t~2_1/A:0_0_2/B:0-0-2~1-1&1-10#0-0$0-2!0-0;3-4|i/C:0+0+1/D:NN_2/E:DT+1~1+5&0+3#0+1/F:NN_6/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-D^i-O:+t=@~1_1/A:0_0_2/B:0-0-1~1-6&2-9#0-0$0-2!0-0;4-3|O:/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-i^O:-t+@=b~1_2/A:0_0_1/B:0-0-2~2-5&3-8#0-0$0-2!0-0;5-2|@/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-O:^t-@+b=aI~2_1/A:0_0_1/B:0-0-2~2-5&3-8#0-0$0-2!0-0;5-2|@/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-t^@-b+aI=Q~1_2/A:0_0_2/B:0-0-2~3-4&4-7#0-0$0-2!0-0;6-1|aI/C:0+1+1/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-@^b-aI+Q=g~2_1/A:0_0_2/B:0-0-2~3-4&4-7#0-0$0-2!0-0;6-1|aI/C:0+1+1/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-b^aI-Q+g=r~1_1/A:0_0_2/B:0-1-1~4-3&5-6#0-0$0-1!0-0;7-5|Q/C:0+0+3/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-aI^Q-g+r=@~1_3/A:0_1_1/B:0-0-3~5-2&6-5#0-0$1-1!0-0;1-4|@/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-Q^g-r+@=f~2_2/A:0_1_1/B:0-0-3~5-2&6-5#0-0$1-1!0-0;1-4|@/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-g^r-@+f=i~3_1/A:0_1_1/B:0-0-3~5-2&6-5#0-0$1-1!0-0;1-4|@/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-r^@-f+i=@~1_2/A:0_0_3/B:0-0-2~6-1&7-4#0-0$1-1!0-0;2-3|i/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-@^f-i+@=v~2_1/A:0_0_3/B:0-0-2~6-1&7-4#0-0$1-1!0-0;2-3|i/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-f^i-@+v=@~1_2/A:0_0_2/B:0-0-2~1-1&8-3#0-0$1-1!0-0;3-2|@/C:0+0+1/D:NN_6/E:IN+1~3+3&1+2#1+2/F:DT_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-i^@-v+@=h~2_1/A:0_0_2/B:0-0-2~1-1&8-3#0-0$1-1!0-0;3-2|@/C:0+0+1/D:NN_6/E:IN+1~3+3&1+2#1+2/F:DT_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-@^v-@+h=O:~1_1/A:0_0_2/B:0-0-1~1-1&9-2#0-0$1-1!0-0;4-1|@/C:0+1+3/D:IN_1/E:DT+1~4+2&2+1#1+1/F:NN_1/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-v^@-h+O:=s~1_3/A:0_0_1/B:0-1-3~1-1&10-1#0-0$1-0!0-0;5-0|O:/C:0+0+0/D:DT_1/E:NN+1~5+1&2+1#2+0/F:SIL_0/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-@^h-O:+s=pau~2_2/A:0_0_1/B:0-1-3~1-1&10-1#0-0$1-0!0-0;5-0|O:/C:0+0+0/D:DT_1/E:NN+1~5+1&2+1#2+0/F:SIL_0/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-h^O:-s+pau=_~3_1/A:0_0_1/B:0-1-3~1-1&10-1#0-0$1-0!0-0;5-0|O:/C:0+0+0/D:DT_1/E:NN+1~5+1&2+1#2+0/F:SIL_0/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
-O:^s-pau+_=_~1_1/A:0_1_3/B:0-0-1~1-1&0-11#0-0$0-2!0-0;1-0|_/C:0+0+0/D:NN_1/E:SIL+1~0+6&0+3#1+0/F:SIL_0/G:3_2/H:10=5~3=1|F/I:0_0/J:10+16-2
+pau^D-i+O:=t~2_1/A:0_0_2/B:0-0-2~1-1&1-10#0-0$0-2!0-0;3-4|i/C:0+0+1/D:NN_2/E:DT+1~1+5&0+3#0+1/F:...
+D^i-O:+t=@~1_1/A:0_0_2/B:0-0-1~1-6&2-9#0-0$0-2!0-0;4-3|O:/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN...
+i^O:-t+@=b~1_2/A:0_0_1/B:0-0-2~2-5&3-8#0-0$0-2!0-0;5-2|@/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_...
+O:^t-@+b=aI~2_1/A:0_0_1/B:0-0-2~2-5&3-8#0-0$0-2!0-0;5-2|@/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN...
+t^@-b+aI=Q~1_2/A:0_0_2/B:0-0-2~3-4&4-7#0-0$0-2!0-0;6-1|aI/C:0+1+1/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN...
+@^b-aI+Q=g~2_1/A:0_0_2/B:0-0-2~3-4&4-7#0-0$0-2!0-0;6-1|aI/C:0+1+1/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN...
+b^aI-Q+g=r~1_1/A:0_0_2/B:0-1-1~4-3&5-6#0-0$0-1!0-0;7-5|Q/C:0+0+3/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_...
+aI^Q-g+r=@~1_3/A:0_1_1/B:0-0-3~5-2&6-5#0-0$1-1!0-0;1-4|@/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_...
+Q^g-r+@=f~2_2/A:0_1_1/B:0-0-3~5-2&6-5#0-0$1-1!0-0;1-4|@/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1...
+g^r-@+f=i~3_1/A:0_1_1/B:0-0-3~5-2&6-5#0-0$1-1!0-0;1-4|@/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1...
+r^@-f+i=@~1_2/A:0_0_3/B:0-0-2~6-1&7-4#0-0$1-1!0-0;2-3|i/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1...
+@^f-i+@=v~2_1/A:0_0_3/B:0-0-2~6-1&7-4#0-0$1-1!0-0;2-3|i/C:0+0+2/D:DT_1/E:NN+6~2+4&0+3#1+1/F:IN_1...
+f^i-@+v=@~1_2/A:0_0_2/B:0-0-2~1-1&8-3#0-0$1-1!0-0;3-2|@/C:0+0+1/D:NN_6/E:IN+1~3+3&1+2#1+2/F:DT_1...
+i^@-v+@=h~2_1/A:0_0_2/B:0-0-2~1-1&8-3#0-0$1-1!0-0;3-2|@/C:0+0+1/D:NN_6/E:IN+1~3+3&1+2#1+2/F:DT_1...
+@^v-@+h=O:~1_1/A:0_0_2/B:0-0-1~1-1&9-2#0-0$1-1!0-0;4-1|@/C:0+1+3/D:IN_1/E:DT+1~4+2&2+1#1+1/F:NN_1...
+v^@-h+O:=s~1_3/A:0_0_1/B:0-1-3~1-1&10-1#0-0$1-0!0-0;5-0|O:/C:0+0+0/D:DT_1/E:NN+1~5+1&2+1#2+0/F:SI...
+@^h-O:+s=pau~2_2/A:0_0_1/B:0-1-3~1-1&10-1#0-0$1-0!0-0;5-0|O:/C:0+0+0/D:DT_1/E:NN+1~5+1&2+1#2+0/F:...
+h^O:-s+pau=_~3_1/A:0_0_1/B:0-1-3~1-1&10-1#0-0$1-0!0-0;5-0|O:/C:0+0+0/D:DT_1/E:NN+1~5+1&2+1#2+0/F:...
+O:^s-pau+_=_~1_1/A:0_1_3/B:0-0-1~1-1&0-11#0-0$0-2!0-0;1-0|_/C:0+0+0/D:NN_1/E:SIL+1~0+6&0+3#1+0/F:...
 \end{lstlisting}
+    \caption{Truncated label representation of the phrase "the autobiography of a horse."}
     \label{fig:sentence-lab}
-    \caption{Label representation of the phrase "the autobiography of a horse."}
 \end{figure}
 
 %To convert the sentences to these Label representations, along with a prediction of the duration of each phoneme so we can use them as examples to train the synthesizer models, the Ogmios framework \cite{bonafonte2006ogmios} was used during the development of this project. In this program, a series of modules are combined in order to perform the task of phoneme segmntation and duration prediction. Figure \ref{fig:ogmios-pipeline} shows the Ogmios modules:
@@ -282,11 +285,11 @@ O:^s-pau+_=_~1_1/A:0_1_3/B:0-0-1~1-1&0-11#0-0$0-2!0-0;1-0|_/C:0+0+0/D:NN_1/E:SIL
 To obtain the Labels of the Blizzard corpus, first the sentences were phonetically segmented. This process was done using the Ramses and Ogmios \cite{bonafonte2006ogmios} software. The whole process was mostly automated following a guide:
 
 \begin{enumerate}
-    \item The text files are converted to their phonetic representation. Speech parameters are also computed from the audio files from where a codebook created and quantized.
-    \item The next step estimates a HMM for every phonem using the speech parameters. Using these HMM models and the phonetic transcriptions, a force alignment is performed to find the transitions of the phonemes and the internal pauses and silences in the sentences using the Viterbi algorithm.
+    \item The text files are converted to their phonetic representation. Speech parameters are also computed from the audio files from where a codebook is created and quantized.
+    \item The next step estimates a semi-continuous HMM, where only the GMM parameters are quantized, for every phonem using the speech parameters. Using these HMM models and the phonetic transcriptions, a force alignment is performed to find the transitions of the phonemes and the internal pauses and silences in the sentences using the Viterbi algorithm.
     \item Next it creates a diphone transcription \cite{marino1997demiphone} of the sentences and estimates an HMM of them.
-    \item Finally, a force alignment is performed again to ontain the diphone transitions and compute the duration of each phoneme.
-    \item A script from the server is called to convert the outputs from the Ogmios program to the Label representation with the phoneme durations.
+    \item Finally, a force alignment is performed again to obtain the diphone transitions in order to compute the duration of each phoneme.
+    \item A script is called to convert the outputs from the Ogmios program to the Label representation with the phoneme durations.
 \end{enumerate}
 
 \begin{comment}
@@ -326,7 +329,7 @@ This label conversion is carried out with the aid of the Ramses and Ogmios softw
 \end{enumerate}
 \end{comment}
 
-\subsection{Linguistic features normalization}
+\section{Linguistic features normalization}
 
 The linguistic features, also had to be normalized prior to training. As seen previously, the label format contains both categorical features and real features. The categorical information was encoded so that all categories are orthogonal to each other by using a one-hot encoding. As a small example of a one-hot encoding, consider the three categories $\{A, B, C\}$. The  one-hot encoding for the three categories is $\{(1,0,0), (0,1,0), (0,0,1)\}$.
 
@@ -337,7 +340,7 @@ The real features from the acoustic features are normalized so that the mean equ
     \label{eq:znorm}
 \end{equation}
 
-The predicted duration of each phoneme was log-compressed to avoid having a long-tailed distribution that can distort the training of the model when using the Mean Square Error (ME) minimization as discussed in \cite{pascual2006deep}. Figure \ref{fig:hist-d} contains the histogram of the raw predicted durations and the histogram after the log-compression operation. This operation was performed by simply taking the natural logarithm of the stored phoneme durations:
+The predicted duration of each phoneme was log-compressed to avoid having a long-tailed distribution that can distort the training of the model when using the Mean Square Error (MSE) minimization as discussed in \cite{pascual2016deep}. Figure \ref{fig:hist-d} contains the histogram of the raw predicted durations and the histogram after the log-compression operation. This operation was performed by simply taking the natural logarithm of the stored phoneme durations:
 
 \begin{equation}
     \hat{d} = log(d)
@@ -351,9 +354,9 @@ The predicted duration of each phoneme was log-compressed to avoid having a long
     \label{fig:hist-d}
 \end{figure}
 
-Once we have obtained the linguistic features, we discard of those who reference the past and only keep the ones tagged with an asterisk ($*$) in Table \cite{tab:lab-format}. This is because the models are based on LSTM-RNN which are known to be good at modeling long term dependencies\cite{hochreiter1997long}.
+Once we have obtained the linguistic features, we discard of those who reference the past and only keep the ones tagged with an asterisk ($*$) in Table \ref{tab:lab-format}. This is because the models are based on LSTM-RNN which are known to be good at modeling long term dependencies from the past\cite{hochreiter1997long}.
 
-\subsection{Baseline training}
+\section{Training of the baseline}
 
 As mentioned before, the system is developed within the Socrates Test-to-speech framework. In the version that was used, this program allows us to define the full architecture in a plain-text configuration file. In this file we specify the number of layers, inputs parameters, the paths where the training, test and validation data are stored in the disk, and the path where to store the intermediate files that the framework generates during training (network weights, loss curves and cached information). An example of configuration file is shown in Figure \ref{fig:soc-conf}.
 
@@ -365,7 +368,7 @@ name="labdecode_core"
 [[tts_core]]                                       
 name="dur_rnn_core"                                
 topology="baseline/dur_rnn_core-eng.cfg"           
-dur_stats="model/73/dur/dur.stats.test"            
+dur_stats="model/73/dur/dur.stats.train"            
 train_table="../tables/duration/baseline/train.dur"
 test_table="../tables/duration/baseline/test.dur"  
 valid_table="../tables/duration/baseline/valid.dur"
@@ -374,12 +377,12 @@ tables_cache_path="baseline/tables_cache"
                                                    
 [[tts_core]]                                       
 name="dur2aco_norm_core"                           
-dur_stats="model/73/dur/dur.stats.test"
+dur_stats="model/73/dur/dur.stats.train"
 
 [[tts_core]]
 name="aco_rnn_core"
-dur_stats="model/73/aco/dur.stats.test"
-aco_stats="model/73/aco/aco.stats.test"
+dur_stats="model/73/aco/dur.stats.train"
+aco_stats="model/73/aco/aco.stats.train"
 train_table="../tables/acoustic/baseline/train.aco"
 test_table="../tables/acoustic/baseline/test.aco"
 valid_table="../tables/acoustic/baseline/valid.aco"
@@ -390,8 +393,8 @@ loss_path="baseline/loss_curves/"
 [[tts_core]]
 name="ahodecode_core
     \end{lstlisting}
-    \label{fig:soc-conf}
     \caption{Configuration example for the baseline system. Some options have been omitted.}
+    \label{fig:soc-conf}
 \end{figure}
 
 In this example, we specify that this model is composed of five modules, called cores within the framework. Each of these cores perform the following actions
@@ -402,20 +405,22 @@ In this example, we specify that this model is composed of five modules, called 
     \item \textbf{dur2aco\_norm\_core} denormalizes the predicted duration and generates the input features that are feed to the acoustic model. It also adds the durations and relative durations as mentioned at the beginning of this chapter.
     \item \textbf{aco\_rnn\_core} predicts the acoustic features explained in Section \ref{sec:aco-features}.
     \item \textbf{ahodecode\_core} takes the output from the previous core, formats the data to be input to the Ahodecoder, and produces a WAVE file containing the synthesized speech.
-    \item \textbf{ahodecode\_core} takes the output from the previous core, formats the data to be input to the Ahodecoder, and produces a WAVE file containing the synthesized speech.
+    %\item \textbf{ahodecode\_core} takes the output from the previous core, formats the data to be input to the Ahodecoder, and produces a WAVE file containing the synthesized speech.
 \end{enumerate}
 
 The configuration file also has access to the "stats" of the features that contain the minimum and maximum values so that the compression from \ref{eq:out-norm} can be undone.
 %The two models: duration and acoustic, also have access to information about the minimum and maximum values of the input and output features so that the min-max compression can be undone.
 
-As mentioned previously, the Blizzard Challenge dataset contains roughly twenty hours of speech data. Due to complications loading the data into memory using the framework, we had to cut the total amount down to 30\% to train the acoustic model. Newer releases of this framework deal with this problem so it can handle the full corpus data.
+As mentioned previously, the Blizzard Challenge corpus contains roughly twenty hours of speech data. Due to complications loading the data into memory using the framework, we had to cut the total amount down to 30\% to train the acoustic model. Newer releases of this framework deal with this problem so it can handle the full corpus data.
 
-\section{Expressive synthesis development}
+This chapter has covered the baseline architecture, data preparation and training. The next step of the project was to add expressive features to the system. The following chapter focuses on this.
+
+\chapter{Expressive speech synthesizer}
 
 %TODO
-The baseline system has been explained. Once we had the system up and running it was time to introduce the modifications that would allow for expressive speech to be modeled by the system. The way this is done in this project is by introducing a new set of features as inputs to the system (both the duration and acoustic model). These are known as the embeddings that encapsulate the information about the way a given sentence is supposed to be synthesized like, given its semantic content. In this section we describe the process of obtaining these new features. Other than these new inputs, the developed system shares the same architecture from the baseline system.
+Once we had the system up and running it was time to introduce the modifications that would allow for expressive speech to be modeled by the system. The way this is done in this project is by introducing a new set of features as inputs to the system (both the duration and acoustic model). These are known as the embeddings that encapsulate the information about the way a given sentence is supposed to be synthesized like, given its semantic content, and they are used alongside the linguistic features from the baseline system. In this section we describe the process of obtaining these new features. Other than these new inputs, the developed system shares the same architecture from the baseline system.
 
-\subsection{Sentiment analysis \& embedding extraction task} \label{sec:sa}
+\section{Sentiment analysis \& embedding extraction task} \label{sec:sa}
 
 \tikzstyle{layer} = [rectangle, draw, fill=blue!20, text centered, minimum width=19em, minimum height=2em]
 
@@ -441,7 +446,7 @@ The baseline system has been explained. Once we had the system up and running it
 \end{figure}
 \end{comment}
 
-Once the baseline system was developed, the additions to the initial system were developed. These involve obtaining the expressive paragraph embeddings that would allow for the modeling of the expressiveness of the speech signal. We used sentiment analysis to capture the expressive information of the Blizzard Challenge dataset that was used in the baseline system. Because the sentences on this dataset are not made for sentiment analysis task, they lack the information to train a text classification system. To perform this text classification task, we used the Stanford sentiment treebank dataset \cite{socher2013recursive}. An example of a tagged sentence from this dataset is shown in figure \ref{fig:tree}.
+Once the baseline system was developed, the additions to the initial system were developed. These involve obtaining the expressive paragraph embeddings that would allow for the modeling of the expressiveness of the speech signal. We used sentiment analysis to capture the expressive information of the Blizzard Challenge dataset that was used in the baseline system. Because the sentences on this dataset are not made for sentiment analysis tasks, they lack the information to train a text classification system. To perform this text classification task, we used the Stanford sentiment treebank dataset \cite{socher2013recursive}, which contains a list of movie reviews. An example of a tagged sentence from this dataset is shown in figure \ref{fig:tree}.
 
 \begin{figure}[h]
     \begin{lstlisting}[basicstyle=\small,frame=single]
@@ -472,26 +477,26 @@ Each of the nodes on the tree is tagged in a scale from 0 to 4, 0 meaning very n
 %The following list explains the different layers of the architecture:
 
 \begin{itemize}
-    \item The first layer is an embedding layer. Each word is transformed into a low dimensional (300) representation. This step converts a sentence into a signal suitable for the next convolutional layer. The embedding layer consists of a N*300 matrix where N is the size of the vocabulary and the $n$-th vector column corresponds to the embedding of the $n$-th word in the vocabulary.
+    \item The first layer is an embedding layer. Each word is transformed into a low dimensional (300) representation. This step converts a sentence into a signal suitable for the next convolutional layer. The embedding layer consists of a (N+1)*300 matrix where N is the size of the vocabulary and the $n$-th vector column corresponds to the embedding of the $n$-th word in the vocabulary. An extra column is used for words that are not from the vocabulary and contains a random value. This architecture in particular has two-channel inputs, one with trainable embeddings, and the other with fixed ones. Both embedding matrices are initialized to the Glove embeddings \cite{pennington2014glove}.
     \item A convolutional layer with filters of sizes 3, 4 and 5 with 100 feature maps each. 
     \item A max-over-time pooling operation \cite{collobert2011natural}, where we select the maximum value from each of the feature maps.
     \item A Fully connected layer with softmax activations that give the output of the classification task. This layer is regularized using the dropout method with dropout probability of $0.5$ \cite{srivastava2014dropout} and the weights of this network are constrained using l2 regularization.
 \end{itemize}
 
-We choose the max-over-time pooling layer activations as the additional inputs added to the baseline synthesizer model. There is an issue with using the Stanford treebank dataset to train this classifier to obtain features for the synthesizer. Because the dataset is based on movie reviews, the text domain doesn't belong to the same from the Blizzard challenge data that we use to train the synthesizer models, therefore, the text classifier network has to be adapted. The following section explains the methodology that was followed in order to attempt to achieve this task.
+We choose the max-over-time pooling layer activations to obtain the additional inputs that added to the baseline synthesizer model. There is an issue with using the Stanford treebank dataset to train this system. Because the dataset is based on movie reviews, the text domain doesn't belong to the same from the Blizzard challenge data, which is the one we use to train the synthesizer models. Therefore, the sentiment analysis network has to be adapted. The following section explains the methodology that was followed in order to attempt to achieve this task.
 
-\subsection{Network domain adaptation}
+\section{Network domain adaptation}
 
-To perform the domain adaptation we do the same classification task on a different architecture using the Blizzard challenge data. This network makes the prediction with the audio files as inputs. As explained before, this dataset is not prepared for text classification therefore they lack the class tags needed. We obtain these by using the network from the previous section after it has been trained using the Stanford sentiment treebank dataset. In \cite{aytar2016soundnet} they train a waveform classifier using unlabeled audio files and a pre-trained network to obtain them. We perform the same task using audio and text data instead.
+To perform the domain adaptation, we do the same classification task on a different architecture using the Blizzard challenge data. This network makes the prediction with the audio files as inputs. As explained before, this dataset is not prepared for text classification therefore they lack the class tags needed. We obtain these by using the network from the previous section after it has been trained using the Stanford sentiment treebank dataset. In \cite{aytar2016soundnet} they train a waveform classifier using unlabeled audio files and a pre-trained network to obtain them from the video frames. We perform the same task using audio and text data instead.
 
 This task is performed in two steps:
 
 \begin{enumerate}
     \item We train the audio based network by using the text network to obtain the labels. Because the labels that we obtain for the Blizzard sentences are probabilities, we optimize the network using KL-divergence using standard back-propagation \cite{aytar2016soundnet}.
-    \item After a fixed number of iterations, we fine tune \cite{yosinski2014transferable} the text network by using labels obtained from the audio network. The two networks take turns to perform a back-propagation pass. Because the state of the weight of each network is constantly changing, we intend to leak information about the audio files into the text network.
+    \item After a fixed number of iterations, we fine tune \cite{yosinski2014transferable} the text network by using labels obtained from the audio network. At this point, the two networks take turns to perform a back-propagation pass. Because the state of the weight of each network is constantly changing, we intend to leak information about the audio files into the text network.
 \end{enumerate}
 
-\subsection{Training embeddings extraction and expressive synthesis}
+\section{Training embeddings extraction and expressive synthesis}
 
 \subsection*{Sentiment analysis task}
 
@@ -512,7 +517,7 @@ To train this sentiment analysis task, we use all the sentences from the trainin
 \begin{table}[h]
     \centering
     \begin{tabular}{l|c|c|c|c|c|c|c|c|c}
-                     & conv & pool & conv & pool & conv & pool & conv & conf & conv \\
+                     & conv & pool & conv & pool & conv & pool & conv & conv & conv \\
         \hline
         Feature maps & 32    & 32   & 64   & 64   & 128  & 128  & 256 & 512  & 5 \\
         Filter size  & 64    & 8    & 32   & 8    & 16   & 8    & 8   & 4    & 5 \\
@@ -532,20 +537,10 @@ Once the sentiment analysis task is done, the same network has to be adapter for
     \item repeat step 2 for  a fixed number of iterations.
 \end{enumerate}
 
-\subsection{Training the expressive speech synthesizer}
+\section{Training the expressive speech synthesizer}
 
 Once the expressive embeddings are extracted for every sentence in the Blizzard Challenge corpus, we include the new inputs to both the duration and the acoustic model from the baseline system. This is specified in a new Socrates configuration file. Every linguistic feature vector that is input to the system includes the additional features that correspond to the full sentence the given phonemes belong to. After that, the process of training the models is the same that was followed in the baseline system.
 
 One last processing step is to normalize the embeddings by compressing them between the $[0, 1]$ range.
 
-\section{Experiments} \label{sec:systems}
-
-%Explain the experiments that were carried out and whose subsequent evaluation and results are presented in the next chapter
-In order to test the performance of the model, we have performed a series of experiments involving different input configurations of the speech synthesizer models. This experiments are the ones that are shown in the next chapter of this document. %The summary is explained in the following enumeration:
-
-\begin{enumerate}
-    \item Baseline system (only linguistic features from \ref{sec:ling-feat})
-    \item Text embeddings taken from the sentiment analysis network without doing adaptation step.
-    \item Text embeddings but with the adaptation step.
-    \item Train the system using only word embeddings from Glove.
-\end{enumerate}
+The next chapter shows the evaluation results of the project.

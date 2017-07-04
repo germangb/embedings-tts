@@ -1,25 +1,26 @@
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1.1}{\ignorespaces A 3-state left-to-right Hidden Markov Model.\relax }}{10}{figure.caption.11}
-\contentsline {figure}{\numberline {1.2}{\ignorespaces SPSS system based on HMMs. This scheme corresponds to the HTS framework \cite {zen2007hmm}.\relax }}{11}{figure.caption.12}
-\contentsline {figure}{\numberline {1.3}{\ignorespaces RNN-based SPSS scheme. Concepts such as LSTM that appear in the figure are covered at later section of this chapter. The figure is originally from \cite {chen1998rnn}\relax }}{12}{figure.caption.13}
-\contentsline {figure}{\numberline {1.4}{\ignorespaces Basic neuron (left) and neural network configuration (right).\relax }}{14}{figure.caption.14}
-\contentsline {figure}{\numberline {1.5}{\ignorespaces Unfolded RNN\relax }}{17}{figure.caption.15}
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Concatenation system scheme.\relax }}{6}{figure.caption.5}
+\contentsline {figure}{\numberline {1.2}{\ignorespaces A 3-state left-to-right Hidden Markov Model.\relax }}{7}{figure.caption.6}
+\contentsline {figure}{\numberline {1.3}{\ignorespaces SPSS system based on HMMs. This scheme corresponds to the HTS framework \cite {zen2007hmm}.\relax }}{8}{figure.caption.7}
+\contentsline {figure}{\numberline {1.4}{\ignorespaces RNN-based SPSS scheme. Concepts such as LSTM that appear in the figure are covered at later section of this chapter. The figure is originally from \cite {chen1998rnn}\relax }}{10}{figure.caption.8}
+\contentsline {figure}{\numberline {1.5}{\ignorespaces Basic neuron (left) and neural network configuration (right).\relax }}{12}{figure.caption.9}
+\contentsline {figure}{\numberline {1.6}{\ignorespaces Unfolded RNN\relax }}{15}{figure.caption.10}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Baseline models.\relax }}{19}{figure.caption.16}
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Full utilization of system resources by Ahocoder. Memory and CPU usage are close to their limits.\relax }}{22}{figure.caption.18}
-\contentsline {figure}{\numberline {2.3}{\ignorespaces $F_0$ contour interpolation\relax }}{24}{figure.caption.19}
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Training table used to train the acoustic model is stored in the server disk.\relax }}{24}{figure.caption.20}
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Label representation of the phrase "the autobiography of a horse."\relax }}{27}{figure.caption.21}
-\contentsline {figure}{\numberline {2.6}{\ignorespaces Histogram of the phoneme duration predictions by Ogmios.\relax }}{28}{figure.caption.22}
-\contentsline {figure}{\numberline {2.7}{\ignorespaces Configuration example for the baseline system. Some options have been omitted.\relax }}{29}{figure.caption.23}
-\contentsline {figure}{\numberline {2.8}{\ignorespaces Example of sentence tree corresponding to the sentence "Effective but too-tepid biopic"\relax }}{31}{figure.caption.24}
-\contentsline {figure}{\numberline {2.9}{\ignorespaces Text classification architecture. The figure is originally from \cite {DBLP:journals/corr/Kim14f}\relax }}{32}{figure.caption.25}
-\contentsline {figure}{\numberline {2.10}{\ignorespaces Distribution of sentence lengths in the Stanford sentiment treebank dataset.\relax }}{34}{figure.caption.27}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Baseline models.\relax }}{17}{figure.caption.11}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces $F_0$ contour interpolation\relax }}{20}{figure.caption.13}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Training table used to train the acoustic model is stored in the server disk.\relax }}{21}{figure.caption.14}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Truncated label representation of the phrase "the autobiography of a horse."\relax }}{24}{figure.caption.15}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Histogram of the phoneme duration predictions by Ogmios.\relax }}{25}{figure.caption.16}
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Configuration example for the baseline system. Some options have been omitted.\relax }}{26}{figure.caption.17}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Training and validation curves of the sentiment analysis task.\relax }}{37}{figure.caption.30}
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Duration model's training curves\relax }}{38}{figure.caption.32}
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Acoustic model's training curves\relax }}{39}{figure.caption.33}
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Screenshot of the subjective evaluation's web application.\relax }}{40}{figure.caption.34}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Example of sentence tree corresponding to the sentence "Effective but too-tepid biopic"\relax }}{29}{figure.caption.18}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Text classification architecture. The figure is originally from \cite {DBLP:journals/corr/Kim14f}\relax }}{29}{figure.caption.19}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Distribution of sentence lengths in the Stanford sentiment treebank dataset.\relax }}{31}{figure.caption.21}
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Training and validation curves of the sentiment analysis task.\relax }}{34}{figure.caption.24}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Duration model's training curves\relax }}{36}{figure.caption.26}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Acoustic model's training curves\relax }}{36}{figure.caption.27}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Subjective evaluation results.\relax }}{37}{figure.caption.28}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Screenshot of the subjective evaluation's web application.\relax }}{38}{figure.caption.29}
 \addvspace {10\p@ }
 \addvspace {10\p@ }

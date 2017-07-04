@@ -3,60 +3,64 @@
 %In this chapter, Deep Learning and neural networks are briefly introduced. In addition to that, both the text-to-speech and sentiment analysis tasks are also introduced and discussed, including the challenges that they present as well as the classical and more modern techniques that tackle them, and how they have influenced the development of this project. By the end of this chapter, the core concepts necessary for the discussion of the work done in this publication will have been introduced to the reader.
 This chapter gives a brief introduction to the background of this project. The first thing that is discussed is classical methods of speech synthesis, as well as a brief mention of deep learning methods used in this particular task.
 
-Next there is a brief introduction to Deep Learning and deep architectures (both definition and training) a field that is applied to this project. By the end of this chapter, the necessary background will have been introduced for its application in the next chapter.
+Next there is a brief introduction to Deep Learning and deep architectures (both definition and training) a field that is applied in this project. By the end of this chapter, the necessary background will have been introduced for its application in the following chapters.
 
 \section{Speech synthesis}
 
 %Introduction to speech synthesis task
-Speech synthesis is the process of generating a synthetic speech signal, emulating that of a real human being. More specifically, this project focuses on synthesizing the signal given text level information. That means, mapping a piece of text to the sounds a human would make to utter said text, and it has to be possible to generate any text that is given to the system.
+Speech synthesis is the process of generating a synthetic speech signal, emulating that of a human being. More specifically, this project focuses on synthesizing the signal given text level information. That means, mapping a piece of text to the sounds that a human would make. It also has to be possible to generate any text that is given to the system.
 
-Speech synthesis has many applications, from medical to recreational. These systems can be used to help speech impaired people and it can also be used to design more human-like interactions objects.
+%Speech synthesis has many applications, from medical to recreational. These systems can be used to help speech impaired people and it can also be used to design more human-like interactions with objects.
+
+Speech synthesis can be applied to designing computer interfaces such as Apple's Siri or Amazon's Alexa. This section reviews some of the classical and more modern approaches.
 
 %It can also have beneficial impacts from a more financial perspective, for example, by cheapening the cost of producing audiobooks or other products that require the use of real speech today.&
 
-\subsection{Unit selection}
+%\subsection{Unit selection}
+\subsection{Concatenative synthesis by unit selection} \label{sec:concat}
 
-%Description of the unit selection approach
-Unit selection systems render a speech signal by concatenating waveform fragments from a large single-speaker database \cite{hunt1996unit}. The outcome of this technique is highly natural-sounding speech since the fragments that are concatenated come from real waveforms. However, while this system is good at producing natural sounding speech, it lacks the flexibility to produce new speaker sounds or vary the speaking style, as described in \cite{jauk2015creating}, since we are limited by the waveforms database. Each unit also has an associated feature vector containing prosodic information such as pitch and formants.
+Unit selection systems render a speech signal by concatenating waveform fragments from a large single-speaker database \cite{hunt1996unit}. Each unit in the database is also associated by a prosodic feature vector which contains information about pitch and duration of the single phonemes, that is used when finding the best concatenation of waveforms that matches a given target input (the phrase that is being synthesized).
 
-\begin{comment}
+\tikzstyle{box} = [rectangle, draw, fill=white, text centered, minimum width=9em, minimum height=4em]
+\tikzstyle{database} = [cylinder, shape border rotate=90, draw, minimum height=6em, minimum width=9em]
+\tikzstyle{line} = [draw, -latex']
+
 \begin{figure}[h]
     \centering
-    \includegraphics[width=10cm]{figures/unitsel}
-    \caption{Unit selection scheme.}
-    \label{eq:units}
+    \begin{tikzpicture}[node distance = 12em, auto]
+        \node[] (input) {Input targets};
+        \node[box, right of=input, node distance=10em] (select) {Unit Selection};
+        \node[box, right of=select] (concat) {Post-processing};
+        \node[right of=concat, node distance=10em] (output) {Waveform};
+        \node[database, above of=select, node distance=6em] (db) {Database};
+        \path[line] (input) -- (select);
+        \path[line] (select) -- (concat);
+        \path[line] (concat) -- (output);
+        \path[line] (db) -- (select);
+    \end{tikzpicture}
+    \caption{Concatenation system scheme.}
+    \label{fig:concat-sys}
 \end{figure}
-\end{comment}
 
-%The best sequence of concatenated units is found by means of dynamic programming using the Viterbi algorithm,  minimizing the cost of concatenating consecutive units. The cost of concatenation is defined in \cite{unit-cost}. Given a sequence of units $u_1^N$, their corresponding prosodic feature vectors $p_1^N$, the total cost of concatenation has two terms:
-To choose the best sequence of concatenated units, a cost of concatenation is defined \cite{unit-cost} given a sequence of units $u_1^N = \left \{ u_1, u_2, ..., u_N \right \}$ and their corresponding prosodic vectors $p_1^N$:
+Figure \ref{fig:concat-sys} shows the concatenative scheme. The system is composed of two modules, the first is the unit selection module where the best sequence of waveforms that matches the desired input prosodic targets is selected from the database. This sequence is obtained by minimizing the following expression using the Viterbi algorithm:
 
 \begin{equation}
-    C_T^p = C_T^p (u_1^N) = \sum_{i = 1}^{N} C_p (p_t, p_i) 
-    \label{eq:pros-cost}
+    \mathbf{\hat{u}}_1^N = \underset{\mathbf{u_1^N}}{argmin} \left \{ \rho \sum_{i=1}^{N} c_{target} (u_i, t_i) + (1-\rho) \sum_{i=2}^{N} c_{concat} (u_{i-1}, u_i) \right \}
 \end{equation}
 
-\begin{equation}
-    C_T^c = C_T^c (u_1^N) = \sum_{i = 2}^{N} C_c (u_{i-1}, u_i) 
-    \label{eq:concat-cost}
-\end{equation}
+Where $\mathbf{\hat{u}_1^N}$ is the best selection of the $u_i$ units in the database and $t_i$ is the $i$-th target input of the system. $c_{target}$ is the cost of using a particular unit to match a wanted prosodic target, and $c_{concat}$ is the cost of concatenation of two units. The expression has a weighting term $\rho$ that can be used to adjust the outcome.
 
-Where $C_p$ is a function that measures the cost of using a specific feature vector (for example if the units have matching formants and pitch) to match a given target $p_t$ and $C_c$ is the cost of concatenation of two consecutive units (for example a unit ends with the same pitch level that the next one starts with). Finding the best sequence of units is done by using the Viterbi algorithm to minimize the total concatenation cost:
+The post-processing is used to fix the prosodic discontinuities of the raw selected units using pitch-synchronous overlap-add (PSOLA) \cite{moulines1990pitch}, either in the time domain (TD-PSOLA) or the frequency domain (FD-PSOLA). This module is needed specially when the volume of the phoneme database is not very big and the chances of having discontinuities is high.
 
-\begin{equation}
-    u_1^N= \underset{u_1^N}{argmax} \left \{ \rho \cdot C_T^p (u_1^N) + (1-\rho) \cdot C_T^c (u_1^N) \right \}
-    \label{eq:unit-cost}
-\end{equation}
-
-\begin{equation}
-    0 \le \rho \le 1
-\end{equation}
-
-Where $\rho$ is a weighting term that can be used to pay more attention to the targets that to the concatenation, or vice versa.
+The outcome of concatenative systems can be highly natural-sounding speech, but it has a drawback: the database is always needed therefore the memory footprint of this technique can be high. To remedy this, statistical approaches are used as seen in the following section.
 
 \subsection{Statistical Parametric Speech Synthesis}
 
-In statistical-parametric speech synthesis (SPSS) a set of spectral and excitation parameters are extracted from a speech corpus from where a set of statistical generative models (typically a hidden Markov model or HMM) are trained to model the them for use in speech synthesis.
+Concatenative systems suffer from a large memory footprint due to the requirement of a waveform fragment database. To remedy this, statistical parametric speech synthesis (SPSS) is based on modeling the statistical properties of speech. To explain this approach, the scheme from Figure \ref{fig:hts} from the HTS framework \cite{zen2007hmm} is used as a guide.
+
+This technique is perfomed in two phases. The first one is a training phase (top half in Figure \ref{fig:hts}) where each phoneme in a language is modeled by a finite-state structure called Hidden Markov Model (HMM) using a speech corpus, and the second phase is the synthesis (bottom half) where the trained models are used to synthesize the speech.
+
+In the training phase, a large speech corpus is used. From this corpus we extract the excitation and spectral parameters (acoustic features) from the audio files and the phoneme representations of the transcripts (linguistic features or Labels in the figure). This data is used to train a model for each phoneme. The models are HMMs from Figure \ref{fig:hmm}
 
 \begin{figure}[h]
     \centering
@@ -68,7 +72,15 @@ In statistical-parametric speech synthesis (SPSS) a set of spectral and excitati
     \label{fig:hmm}
 \end{figure}
 
-As seen in Figure \ref{fig:hmm}, a HMM is a finite state machine that can be described by the tuple $\lambda = \left < A, B, \Pi \right >$ where $A$ are the state transition probabilities, $B$ are the output distributions on each state (spectral \& excitation output parameters) and $\Pi$ are the initial state probabilities. HMMs provide a time-discrete series of observations from a distribution of the speech parameters. In contrast with unit selection, SPSS models offer a more compact representation than unit selection since they don't require a large database after the models have been trained.
+Which can be represented by the touple $\lambda = \left < A, B, \Pi  \right >$ where A are the state transition probabilities $a_{i \rightarrow j}$, $B$ are the acoustic observation distributions $b_i(y)$, and $\Pi$ are the initial state probabilities $\pi_i$. The acoustic observations $\left \{ y_1, y_2, y_3, ... \right  \}$ are modeled by Gaussian Mixture Models (GMM). The parameters of the HMMs are estimated using the Baum-Welch algorithm \cite{blunsom2004hidden}.
+
+In the synthesis phase, the trained models are used to generate the acoustic observations, also by means of ML, given set of linguistic features passed as inputs (text analysis block in Figure \ref{fig:hts}). The HMM acoustic observations are processed through a synthesis filter (generally a vocoder) to generate the final synthetic speech.
+
+SPSS systems are more efficient because they don't require a large database in the synthesis stage. Moreover, they also overcome another limitation of concatenative systems of not being able to generate multiple voices and styles of speech. SPSS offer this flexibility when the parameters are modified appropriately as described in \cite{pascual2016deep} and \cite{zen2007hmm}.
+
+%In statistical-parametric speech synthesis (SPSS) a set of spectral and excitation parameters are extracted from a speech corpus from where a set of statistical generative models (typically a hidden Markov model or HMM) are trained to model them for use in speech synthesis.
+
+%As seen in Figure \ref{fig:hmm}, a HMM is a finite state machine that can be described by the tuple $\lambda = \left < A, B, \Pi \right >$ where $A$ are the state transition probabilities, $B$ are the output distributions on each state (spectral \& excitation output parameters) and $\Pi$ are the initial state probabilities. HMMs provide a time-discrete series of observations from a distribution of the speech parameters. In contrast with unit selection, SPSS models offer a more compact representation than unit selection since they don't require a large database after the models have been trained.
 
 \begin{figure}
     \centering
@@ -77,18 +89,28 @@ As seen in Figure \ref{fig:hmm}, a HMM is a finite state machine that can be des
     \label{fig:hts}
 \end{figure}
 
-Moreover, SPSS also overcomes the limitation of only being limited to one speaker, since we can easily modify the speaker characteristics and speaking styles by transforming the model parameters appropriately as describes in \cite{zen2007hmm} and \cite{pascual2006deep}.
+%Moreover, SPSS also overcomes the limitation of only being limited to one speaker, since we can easily modify the speaker characteristics and speaking styles by transforming the model parameters appropriately as described in \cite{zen2007hmm} and \cite{pascual2016deep}.
 
 %In the methodology chapter of this document, the concepts from this section will be revisited and explained more in-depth.
 
 \subsection{Recurrent Neural Network-based Speech Synthesis} \label{sec:rnn-tts}
 
 %RNNs
-Another approach to speech synthesis more closely related to this project, is using recurrent neural networks (RNNs) to process a sequence of linguistic features and predict the same excitation and spectral parameters from SPSS.
+Another approach to speech synthesis more closely related to this project, is using recurrent neural networks (RNNs) to process a sequence of linguistic features and predict the same excitation and spectral parameters than SPSS.
 
-RNNs are covered in more detail in a later section of this chapter. As describes by \cite{chen1998rnn}, this scheme consists of using neural networks to generate parametric speech in two stages: a duration model that predicts the duration of a phoneme in a sentence, and an acoustic model to predict the spectral and excitation parameters for as many time steps as predicted by the duration model. Figure \ref{fig:rnn-tts-0} shows the complete scheme of this approach.
+Figure \ref{fig:rnn-tts-0} from \cite{chen1998rnn} is used as a guide for this section, but only the synthesis part, since the training will be covered later in this chapter. This one in particular uses a special kind of RNN called LSTM-RNN, also covered later in this chapter.
 
-\begin{figure}[h]
+This approach is similar to the HMM based one from the previous section, but this one uses a special kind of neural networks called recurrent neural networks (more about them later in this chapter) to generate the acoustic observations that are used to reconstruct the speech signal. More specifically, it contains two models: a duration model, and an acoustic model.
+
+The input of this system is also a phonetic representation of the text (text analysis and linguistic feature extraction in the figure). The model first predicts the duration of a frame to obtain a phoneme duration using the duration model (bottom half of the figure).
+
+Afterwards, the acoustic model (another LSTM-RNN) is used to generate as many acoustic predictions as to match the predicted duration of the phoneme, using the same linguistic features and the predicted duration as inputs (note that the same linguistic features can be used multiple times in this stage).
+
+The predicted acoustic features are fed to a reconstruction filter or vocoder that generates the speech signal.
+
+%RNNs are covered in more detail in a later section of this chapter. As describes by \cite{chen1998rnn}, this scheme consists of using neural networks to generate parametric speech in two stages: a duration model that predicts the duration of a phoneme in a sentence, and an acoustic model to predict the spectral and excitation parameters for as many time steps as predicted by the duration model. Figure \ref{fig:rnn-tts-0} shows the complete scheme of this approach.
+
+\begin{figure}
 \centering
     \includegraphics[height=13cm]{figures/rnn-tts}
     \caption{RNN-based SPSS scheme. Concepts such as LSTM that appear in the figure are covered at later section of this chapter. The figure is originally from \cite{chen1998rnn}}
@@ -97,17 +119,29 @@ RNNs are covered in more detail in a later section of this chapter. As describes
 
 \subsection{Expressive speech synthesis}
 
+One common limitation in the sythesis techniques explained above is that they might not be suitable for applications that benefit from expressive speech, such as audiobook reading. Since this project focuses on overcoming this limitation, this section reviews how this problem has been tackled in the past.
+
+%There exists several ways of obtaining expressive speech. One example involves having an emotion target which tells the synthesizer how to synthesize the final waveform as is done in \cite{balut2002expressive} and \cite{eide2004corpus}, where a concatetive based system is used. In these works a positive and a negative model of the pitch is trained so that the synthesized speech can be modified to match a desired emotion.
+There exists several ways of obtaining expressive speech. One example involves defining an emotion target which tells the synthesizer how to generate the final waveform. In \cite{bulut2002expressive} and \cite{eide2004corpus}, different emotions are modeled using prosodic information such as pitch. They implement this in a concatenative system like the one in Section \ref{sec:concat}. 
+
+Another way of obtaining expressive speech in the bibliography was developed in the VEU research group \cite{jauk2016acoustic}. In contrast with the previous examples, which involve manually selecting a desired emotion target, this work uses deep neural networks (more about them this later in this chapter) to predict acoustic features of expressive speech from text, meaning the exressiveness is obtained from the text itself, something that can be used to develop synthesizers that have adaptive expressiveness.
+
 %Summary of the bibliography of the approaches to expressive speech synthesis.
 %Expressive speech synthesis
-The techniques from the previous sections for doing speech synthesis typically only offer a single speaking style that is independent of the message that is being transmitted. In \cite{bulut2002expressive} and \cite{eide2004corpus} a prosodic target is modeled in order to synthesize a text with different types of emotions using a unit selection systems and pitch prediction to modify the prosodic content of the speech.
+%The techniques from the previous sections for doing speech synthesis typically only offer a single speaking style that is independent of the message that is being transmitted. In \cite{bulut2002expressive} and \cite{eide2004corpus} a prosodic target is modeled in order to synthesize a text with different types of emotions using a unit selection system and pitch prediction to modify the prosodic content of the speech.
 
-More recently, \cite{jauk2016acoustic} uses deep neural networks (more on this in the following sections) to predict acoustic features of expressive speech from semantic vector space representations. The results can be used to enhance the inputs of speech synthesis systems by modeling the expressiveness of a corpus in SPSS systems, which in contrast with \cite{bulut2002expressive} and \cite{eide2004corpus}, the synthesis would adapt to the semantic content of the message.
+%More recently, \cite{jauk2016acoustic} uses deep neural networks (more on this in the following sections) to predict acoustic features of expressive speech from semantic vector space representations. The results can be used to enhance the inputs of speech synthesis systems by modeling the expressiveness of a corpus in SPSS systems, which in contrast with \cite{bulut2002expressive} and \cite{eide2004corpus}, the synthesis would adapt to the semantic content of the message.
 
-\section{Text classification for sentiment Analysis}
+\section{Text classification and sentiment analysis}
 
-Text classification is a task in natural language processing \cite{chowdhury2003natural} (NLP) where a text is assigned a given label automatically. A classic model used for text classification is bag of words \cite{wallach2006topic} (BOW), where a piece of text is assumed to be a sequence of words picked at random from a specific set. In the topic of text classification, classifying text using BOW would involve predicting the set the text belongs to (for example, a SPAM email contains specific words common to all SPAM emails, or a positive text may contain words that are different from a negative text).
+%Text classification is a task in natural language processing \cite{chowdhury2003natural} (NLP) where a text is assigned a given label automatically. A classic model used for text classification is bag of words \cite{wallach2006topic} (BOW), where a piece of text is assumed to be a sequence of words picked at random from a specific set. In the topic of text classification, classifying text using BOW would involve predicting the set the text belongs to (for example, a SPAM email contains specific words common to all SPAM emails, or a positive text may contain words that are different from a negative text).
+Text classification is a task in natural language processing \cite{chowdhury2003natural} (NLP) where a text is assigned a label automatically.
 
-More recently, more modern techniques such as deep learning have been used to improve the accuracy of these systems. In \cite{zhang2015character} text is treated as a signal an processed using Convolutional neural networks (more on this in the next sections) and \cite{DBLP:journals/corr/Kim14f} uses vector representations of words (word embeddings \cite{goldberg2014word2vec}) to classify text.
+A classic model used used in text classification is bag of words \cite{wallach2006topic} (BOW), where a piece of text is assumed to be a sequence of words picked at random from a specific set. In the topic of text classification, classifying text using BOW would involve predicting the set the text belongs to, for example, the probability that an email is SPAM.
+
+More recently, more modern techniques such as deep learning have been used to improve the accuracy of these systems. In \cite{zhang2015character} text is treated as a signal and processed using Convolutional neural networks (more on this in the next sections) and \cite{DBLP:journals/corr/Kim14f} uses vector representations of words (word embeddings \cite{goldberg2014word2vec}) to classify text.
+
+One well known application of text classification, that is used in this project, is sentiment analysis (SA). SA can be applied to classification tasks such as the one from the Stanford Sentiment Treebank dataset \cite{socher2013recursive}, which contains a list of movie reviews and the goal is to predict how positive or negative they are based on the text.
 
 %Introduction to the sentiment or text classification task.
 
@@ -115,11 +149,11 @@ More recently, more modern techniques such as deep learning have been used to im
 
 In recent years, deep structured learning, or more commonly called deep learning is a set of techniques that has risen in popularity and established itself as a new area of machine learning among the scientific and research communities. \cite{deng2014deep}
 
-\cite{bengio2009learning} discussed the limitations of shallow architectures and provided a theoretical basis to the advantages of deeper ones. But it has only been in recent years that such architectures have been able to be put into production with ever-growing popularity thanks to compute technologies being every time more available and affordable to consumers.
+In \cite{bengio2009learning} the authors discussed the limitations of shallow architectures and provided a theoretical basis to the advantages of deeper ones. But it has only been in recent years that such architectures have been able to be put into production with ever-growing popularity, thanks to high performance compute technologies being every time more available and affordable to consumers.
 
 With deep learning architectures, it is possible to learn complex non-linear representations from large amounts of data. Raw data can be processed and turned into several levels of higher level representations to make it possible to reason about it and make tasks such as classification easier and more effective.
 
-In addition to more compute power, large datasets that can take advantage of deep models such Imagenet \cite{russakovsky2015imagenet} are being made publicly available. These datasets are often used as benchmarks and serve as points of reference to drive research and development forward.
+In addition to more computational power, large datasets that can take advantage of deep models such Imagenet \cite{russakovsky2015imagenet} are being made publicly available. These datasets are often used as benchmarks and serve as points of reference to drive research and development forward.
 
 %In summary, one could describe Deep Learning as models capable of obtaining high level information from low level one, and the compute resources and databases that make training of these models possible.
 
@@ -136,7 +170,7 @@ In Deep Learning, a common architecture is the so called Deep Neural Network (DN
     \label{fig:neural-net}
 \end{figure}
 
-DNNs are defined by stacking several layers of basic units called neurons. In each layer, a linear operation takes place, where the inputs $\mathbf{x}= \left \{ 1, x_1, x_2, ..., x_N \right \}$ ($1$ is for a bias term) are linearly combined by a set of weights that are characteristic of each layer. The output of this linear operation is fed to a non-linear activation function (such as a sigmoid (\ref{eq:sigmoid}) or a tanh) which introduces the non-linearities of the system. Equation \ref{eq:neural-layer} shows the operation that takes place in the $i$-th layer, where $\mathbf{W_i}$  is the matrix of weights, $\mathbf{x_i}$ is the input vector of the layer, $\mathbf{y_i}$ is the output vector and $\sigma$ is the activation function.
+DNNs are defined by stacking several layers of basic units called neurons. In each layer, a linear operation takes place, where the inputs $\mathbf{x}= \left \{ 1, x_1, x_2, ..., x_N \right \}$ ($1$ is for a bias term) are linearly combined by a set of weights that are characteristic of each layer. The output of this linear operation is fed to a non-linear activation function (such as a sigmoid (\eqref{eq:sigmoid}) or a tanh) which introduces the non-linearities of the system. Equation \eqref{eq:neural-layer} shows the operation that takes place in the $i$-th layer, where $\mathbf{W_i}$  is the matrix of weights, $\mathbf{x_i}$ is the input vector of the layer, $\mathbf{y_i}$ is the output vector and $\sigma$ is the activation function.
 
 \begin{equation}
     \centering
@@ -159,21 +193,28 @@ Optimizing, or training, a DNN is the process of finding the best possible set o
 
 To optimize the network a cost or loss function is defined to measure the error of the predictions (such as the root mean square error or the cross-entropy error \cite{golik2013cross}). given a loss, we can improve the performance of a model by translating the weight vector in the direction of the gradient.
 
+%Equation \eqref{eq:loss} is a loss function, computed by adding the errors of a batch of vectors of a dataset $L_k(x_k)$. These vectors are the examples from where the network learns. The size of the batch is usually fixed and smaller than the total size of the dataset, and is used to perform an iteration of the weights update. This technique is called stochastic gradient descent \cite{bottou2010large} (SGD).
+Equation \eqref{eq:loss} is a general loss function that is computed from a random batch $B$ of vectors from a dataset $\mathbf{X}$ where $B \subset \mathbf{X}$.
+
 \begin{equation}
-    L(\mathbf{x}; \mathbf{w}) = \sum_{\mathbf{x}_k}^{} L (\mathbf{x_k})
+    L(\mathbf{X}; \mathbf{w}) = \sum_{\mathbf{x}_k \in B}^{} E (\mathbf{x_k})
     \label{eq:loss}
 \end{equation}
+
+Where $\mathbf{w}$ are the weights of the model and $E(x_k)$ is the contribution of the $k$-th vector of the batch to the loss. This technique of not using the whole dataset to compute the loss is called stochastic gradient descent (SGD) \cite{bottou2010large}.
+
+Before updating the weights, the partial derivatives of the loss function are computed using the back-propagation algorithm \cite{chauvin1995backpropagation}. For this we need to be able to compute the derivatives of both the loss function and the activation functions of the neurons. The update can be performed like this:
 
 \begin{equation}
     w_i[n+1] = w_i[n] - \lambda \frac{\partial L(\mathbf{x}; \mathbf{w}[n])}{\partial w_i}
     \label{eq:update_w}
 \end{equation}
 
-Equation \ref{eq:loss} is a loss function, computed by adding the errors of a batch of vectors of a dataset. These vectors are the examples from where the network learns. The size of the batch is usually fixed and smaller than the total size of the dataset, and is used to perform an iteration in the weight update process (Equation \ref{eq:update_w}). This technique is called stochastic gradient descent \cite{bottou2010large} (SGD).
+Where $w_i$ is the $i$-th weight of the model and $\frac{\partial L(x; w[n])}{\partial w_i}$ is the partial derivative of the loss function \eqref{eq:loss} with respect to the $i$-th weight. $\mathbf{w}[n]$ are the weights of the model in the $n$-th iteration.
 
-Before updating the weights, the partial derivatives of the loss function are computed using the back-propagation algorithm \cite{chauvin1995backpropagation}. For this we need to be able to compute the derivatives of both the loss function and the activation functions of the neurons, and the update is performed like in Equation \ref{eq:update_w}.
+The norm of the gradient is scaled by a factor called learning rate (expressed as $\lambda$ in Equation \eqref{eq:update_w}) to speed-up or slow-down the convergence of the loss function during training.
 
-The norm of the gradient can be scaled by a factor called learning rate (expressed as $\lambda$ in Equation \ref{eq:update_w}) to speed-up or slow-down the convergence of the loss function during training. Ways to improve this weight updates are Adam \cite{kingma2014adam} and Adadelta \cite{zeiler2012adadelta}.
+There are more elaborated ways of performing these weight updates, such as the Adam \cite{kingma2014adam} and Adadelta \cite{zeiler2012adadelta} optimizers, which are the ones used in this project.
 
 %\begin{figure}
 %    \centering
@@ -184,7 +225,7 @@ The norm of the gradient can be scaled by a factor called learning rate (express
 
 %To obtain the gradients of the loss function with respect to the weights, the back-propagation algorithm \cite{chauvin1995backpropagation} is used to compute them analytically. This algorithm computes the partial derivatives of the loss function with respect to the weights, given the partial derivatives of the layers later layers, hence the name back-propagation. For this to work, the loss function has to be diferentiable and for this to be true the activation functions of the hidden layers also have to be as well.
 
-%Equation \ref{eq:loss} implies that the loss can be computed given a batch of input vectors, thus the weight updates happen after the network has processed a collection of inputs. We don't need however to process an entire dataset and only use a small portion of it before the update step, in a techniche called stochastic gradient descent (SGD) \cite{bottou2010large}.
+%Equation \eqref{eq:loss} implies that the loss can be computed given a batch of input vectors, thus the weight updates happen after the network has processed a collection of inputs. We don't need however to process an entire dataset and only use a small portion of it before the update step, in a techniche called stochastic gradient descent (SGD) \cite{bottou2010large}.
 
 \section{Recurrent networks}
 
@@ -197,9 +238,9 @@ Recurrent neural networks (RNN) are a special type of architecture capable of mo
     \label{eq:out-rec}
 \end{equation}
 
-Where $\mathbf{x_t}$ is an input vector at the $t$-th timestep and $\mathbf{U}$ is an additional matrix of tranable weights. Because of the introduction of a neuron state, RNNs can model various types of sequential data (predict the next frame of a video given the N first, translate a sequence of words to another a different language, predict the duration of each of the phonemes in a sequence, etc...).
+Where $\mathbf{x_t}$ is an input vector at the $t$-th timestep and $\mathbf{U}$ is an additional matrix of tranable weights. Because of the introduction of a neuron state, RNNs can model various types of sequential data (predict the next frame of a video given the N first or predict the duration of each of the phonemes in a sentence as seen previously).
 
-Recurrent networks can still be trained efficiently by using back-propagation through time \cite{werbos1990backpropagation} which is specific case of back-propagation where the errors are also back-propagation back in time. If we expand \ref{eq:out-rec} we get:
+Recurrent networks can still be trained efficiently by using back-propagation through time \cite{werbos1990backpropagation} which is specific case of back-propagation where the errors are also back-propagated back in time. If we expand \eqref{eq:out-rec} we get:
 
 \begin{figure}
     \centering
@@ -214,13 +255,9 @@ Recurrent networks can still be trained efficiently by using back-propagation th
     \label{eq:out-rec-expanded}
 \end{equation}
 
-The recursive multiplication of $U_t$ make RNNs a special case of DNNs, where the repeated multiplications can cause the gradients to become too small or too big by the time they reach the inputs of the network when doing back-propagation. This is due to the vanishing or exploding gradient problem \cite{bengio1994learning} that occurs in SGD.
+The recursive multiplication of $U_t$ make RNNs a special case of DNNs, where the repeated multiplications can cause the gradients to become too small or too big by the time they reach the inputs of the network when doing back-propagation. This is known as vanishing or exploding gradient problem \cite{bengio1994learning}, a phenomenon that occurs in SGD.
 
-To mitigate this problem in RNNs, we can use specially designed recurrent neurons such as Long Short-Term Memory as opposed to regular RNNs.
-
-\subsection{Long Short-Term Memory (LSTM)}
-
-Long Short-Term Memory \cite{hochreiter1997long} or LSTM are a special kind of recurrent unit that deals with the aforementioned problem of the vanishing gradient. This cell works by introducing gating mechanism operated by soft switches trained while optimizing the network that control the flow of information coming in and out of the cell.
+To mitigate this problem in RNNs, we use specially designed recurrent neurons such as Long Short-Term Memory \cite{hochreiter1997long} (LSTM) as opposed to regular RNN neurons. These cells work with a more sophisticated mechanism that controls the flow of information coming in and out of the cells. LSTMs have proven to be effective at modeling long-term sequences and that's the reason why they are used in this project.
 
 \begin{comment}
 \begin{figure}[h]
@@ -233,7 +270,8 @@ Long Short-Term Memory \cite{hochreiter1997long} or LSTM are a special kind of r
 
 \section{Convolutional Neural Networks}
 
-As seen in Equation \ref{eq:neural-layer}, a neuron activation depends on all the output activation of the previous layer. Convolutional neural networks (CNN) are a type of architecture that contain a type of hidden layers called Convolutional layers. These architectures have proven to be very effective in computer vision applications but they are also used with success in NLP tasks \cite{zhang2015character}.
+As seen in Equation \eqref{eq:neural-layer}, a neuron activation depends on all the output activation of the previous layer. Convolutional neural networks (CNN) are a type of architecture that contains a type of hidden layers called Convolutional layers. These architectures have proven to be very effective in computer vision applications but they are also used with success in NLP tasks \cite{zhang2015character}.
 
 Rather than combining all the outputs of the previous layer, CNN neurons only focus on the activations of a fixed number of neurons from the previous layer \cite{krizhevsky2012imagenet}. While each neuron focuses on a different set of inputs, the total number is fixed and the weights are shared among the activations of the layer. Because of this, we can think of these layers as having an associated kernel that is used to filter the previous layer by means of a convolution to produce a feature map in the layer. The number of feature maps is a parameter of the convolutional layer. %By stacking these layers, the deepest layers can learn very speciliced filters from low level features learnt in the earlier layers (for example a filter that detects faces in a picture, deppends on a filter that detects straight and round edges), making these architectures very popular in computer vision tasks.
 
+Once the state of the art and the deep learning concepts  that are used throughout this project have been reviewed, the next implementation chapters can be explained and discussed.
