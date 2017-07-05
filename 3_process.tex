@@ -7,7 +7,7 @@
 
 \section{Baseline development}
 
-The first stage of this project was to develop a baseline speech synthesizer. This model is used as a reference when comparing the results of the experiments explained in the evaluation chapter. The architecture is based on the work done by \cite{pascual2016deep} by using the Socrates Text-to-speech framework developed in the VEU research group at UPC, which is based on the Keras deep learning library. This is a RNN-LSTM based model, which, as mentioned in section \ref{sec:rnn-tts}, contains a duration model and an acoustic model which are trained independently.
+The first stage of this project was to develop a baseline speech synthesizer. This model is used as a reference when comparing the results of the experiments explained in the evaluation chapter. The architecture (Figure \ref{fig:lstm-tts}) is based on the work done by \cite{pascual2016deep} by using the Socrates Text-to-speech framework developed in the VEU research group at UPC, which is based on the Keras deep learning library. This is a RNN-LSTM based model, which, as mentioned in section \ref{sec:rnn-tts}, contains a duration model and an acoustic model which are trained independently.
 
 \tikzstyle{layer} = [rectangle, draw, fill=blue!20, text centered, minimum width=19em, minimum height=2em]
 
@@ -50,7 +50,7 @@ The first stage of this project was to develop a baseline speech synthesizer. Th
 
 %The developed speech synthesizer is an RNN-based architecture similar to the one presented in chapter 2. As mentioned in that section, the architecture from the baseline system is composed of two sections: a duration model and an acoustic model. It is important to note that this system does not produce the output waveform directly but instead it produces spectral and excitation coefficients like in SPSS based systems. This means that the speech database that we use will have to be processed in order to train the system.
 
-The corpus that has been used for this project contains approximately 20 hours or audiobooks along with the transcripts. This corpus was originally produced for the Blizzard challenge \cite{blizzard} and is already segmented at the utterance level, removing the need to align the whole audio stream with the raw text data. The reason we chose this corpus is because of its richness in expressive content. Table \ref{tab:blizard} shows some information about the audio files that we get from it.
+The corpus that has been used for this project contains approximately 20 hours or audiobooks along with the transcripts. This corpus was originally produced for the Blizzard Challenge 2013 \cite{blizzard} and is already segmented at the utterance level, removing the need to align the whole audio stream with the raw text data. The reason we chose this corpus is because of its richness in expressive content. Table \ref{tab:blizard} shows some information about the audio files that we get from it.
 
 % table with audio information (Sampling, bit depth, channels, etc...)
 \begin{table}[h]
@@ -461,8 +461,8 @@ Tag Sentence
 1   too-tepid
 2   biopic
     \end{lstlisting}
-    \label{fig:tree}
     \caption{Example of sentence tree corresponding to the sentence "Effective but too-tepid biopic"}
+    \label{fig:tree}
 \end{figure}
 
 Each of the nodes on the tree is tagged in a scale from 0 to 4, 0 meaning very negative and 4 being a very positive text. Each sub-sentence was tagged down to the single words of the sentence. We used this dataset to train a CNN-based classifier similar to \cite{DBLP:journals/corr/Kim14f}. This architecture is shown in Figure \ref{fig:cnn-sa}.
@@ -470,8 +470,8 @@ Each of the nodes on the tree is tagged in a scale from 0 to 4, 0 meaning very n
 \begin{figure}[h]
     \centering
     \includegraphics[width=15cm]{figures/cnn}
-    \label{fig:cnn-sa}
     \caption{Text classification architecture. The figure is originally from \cite{DBLP:journals/corr/Kim14f}}
+    \label{fig:cnn-sa}
 \end{figure}
 
 %The following list explains the different layers of the architecture:
@@ -496,7 +496,7 @@ This task is performed in two steps:
     \item After a fixed number of iterations, we fine tune \cite{yosinski2014transferable} the text network by using labels obtained from the audio network. At this point, the two networks take turns to perform a back-propagation pass. Because the state of the weight of each network is constantly changing, we intend to leak information about the audio files into the text network.
 \end{enumerate}
 
-\section{Training embeddings extraction and expressive synthesis}
+\section{Training embeddings extraction and expressive synthesis} \label{sec:domain}
 
 \subsection*{Sentiment analysis task}
 

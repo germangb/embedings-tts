@@ -1,9 +1,8 @@
 \chapter{State of the art}
 
-%In this chapter, Deep Learning and neural networks are briefly introduced. In addition to that, both the text-to-speech and sentiment analysis tasks are also introduced and discussed, including the challenges that they present as well as the classical and more modern techniques that tackle them, and how they have influenced the development of this project. By the end of this chapter, the core concepts necessary for the discussion of the work done in this publication will have been introduced to the reader.
-This chapter gives a brief introduction to the background of this project. The first thing that is discussed is classical methods of speech synthesis, as well as a brief mention of deep learning methods used in this particular task.
+This chapter gives a brief introduction to the background of this project. The first thing that is discussed is classical methods of speech synthesis, as well as a brief mention of deep learning methods used in this particular task. We also discuss text classification.
 
-Next there is a brief introduction to Deep Learning and deep architectures (both definition and training) a field that is applied in this project. By the end of this chapter, the necessary background will have been introduced for its application in the following chapters.
+By the end of this chapter, the necessary background will have been introduced for its application in the following chapters.
 
 \section{Speech synthesis}
 
@@ -189,7 +188,7 @@ The outputs of this activation function are fed to the next layer of neurons unt
 \subsection{Optimization}
 
 %Back propagation algorithm and optimizers.
-Optimizing, or training, a DNN is the process of finding the best possible set of weights that accomplish the best results in a given task. A task that DNNs are used for is classification, where a label is assigned to each input vector (predicting wether an image is from a cat or a dog) and also regression (predicting the expected cost of a property given the land size and proximity to the coast).
+Optimizing, or training, a DNN is the process of finding the best possible set of weights that accomplish the best results in a given task. A task that DNNs are used for is classification, where a label is assigned to each input vector (predicting whether an image is from a cat or a dog) and also regression (predicting the expected cost of a property given the land size and proximity to the coast).
 
 To optimize the network a cost or loss function is defined to measure the error of the predictions (such as the root mean square error or the cross-entropy error \cite{golik2013cross}). given a loss, we can improve the performance of a model by translating the weight vector in the direction of the gradient.
 
@@ -255,7 +254,7 @@ Recurrent networks can still be trained efficiently by using back-propagation th
     \label{eq:out-rec-expanded}
 \end{equation}
 
-The recursive multiplication of $U_t$ make RNNs a special case of DNNs, where the repeated multiplications can cause the gradients to become too small or too big by the time they reach the inputs of the network when doing back-propagation. This is known as vanishing or exploding gradient problem \cite{bengio1994learning}, a phenomenon that occurs in SGD.
+This expansion is graphically represented in Figure \ref{fig:unfold}. The recursive multiplication of $U_t$ make RNNs a special case of DNNs, where the repeated multiplications can cause the gradients to become too small or too big by the time they reach the inputs of the network when doing back-propagation. This is known as vanishing or exploding gradient problem \cite{bengio1994learning}, a phenomenon that occurs in SGD.
 
 To mitigate this problem in RNNs, we use specially designed recurrent neurons such as Long Short-Term Memory \cite{hochreiter1997long} (LSTM) as opposed to regular RNN neurons. These cells work with a more sophisticated mechanism that controls the flow of information coming in and out of the cells. LSTMs have proven to be effective at modeling long-term sequences and that's the reason why they are used in this project.
 

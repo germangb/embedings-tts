@@ -1,6 +1,7 @@
 \documentclass[11pt,a4paper]{report}                                                    
 \usepackage[utf8]{inputenc}                                                             
 \usepackage{amsmath}                                                                    
+\usepackage[toc,page]{appendix}
 \usepackage{booktabs}
 \usepackage{amsfonts}                                                                   
 \usepackage{amssymb}                                                                    
@@ -37,6 +38,7 @@
 \usepackage{multirow}
 
 \usepackage[parfill]{parskip}
+\usepackage[nottoc,notlot,notlof]{tocbibind}
 
 \usepackage{hyperref}
 
@@ -86,6 +88,7 @@
 \setlength{\parskip}{12pt}
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
+
 
 %% PER LES IMATGES A LA CAPÇALERA:
 \newsavebox{\mygraphic}
@@ -142,7 +145,10 @@
 
 		% Title
                 %\textbf{ \Huge Voice Conversion using \\ \vspace{0.3cm} Deep Learning } \\ %\vspace{0.5cm} for Cultural Event Recognition}\\
-                \textbf{ \Huge Paragraph and Word Embeddings \\ \vspace{0.3cm} for \\ \vspace{0.5cm} Expressive Speech Synthesis} \\ %\vspace{0.5cm} for Cultural Event Recognition}\\
+                 %\Huge Paragraph and Word Embeddings for \\ \vspace{0.3cm} Expressive Speech Synthesis \\ 
+                 \Huge Word and Paragraph Embeddings for \\ \vspace{0.3cm} Expressive Speech Synthesis \\ 
+
+                %\textbf{\large A Degree Thesis \\ Submitted to the Faculty of the \\ Escola Tècnica d'Enginyeria de Telecomunicació de \\ Barcelona}
 %		\rule{\textwidth}{0.5pt}
 %		\vspace{-2ex}
 %		\centering
@@ -152,13 +158,18 @@
 		%\rule{\textwidth}{0.03mm}\\
 		\vspace*{0.1in}
 		%subtitle
-		{\Large  Degree's Thesis \\Audiovisual Systems Engineering }\\
-		\vspace{5cm}
+		%{\Large  Degree's Thesis \\Audiovisual Systems Engineering }\\
+		{\Large A Degree Thesis Submitted to the Faculty of the Escola Tècnica d'Enginyeria de Telecomunicació de Barcelona \\ Submitted by}\\
+		\vspace{2cm}
+		{\Large German Gomez Bajo}\\
+		\vspace{2cm}
+		{\Large In partial fullfillment of the requirements for the degree in Audiovisual Systems Engineering }\\
+		\vspace{1cm}
 		\begin{tabular}{ll}
 
 			% Student name
-			\large{\textbf{Author:}}	&
-			\large{German Gomez Bajo} \\
+			%\large{\textbf{Author:}}	&
+			%\large{German Gomez Bajo} \\
 
 			% Advisors' name
 			\large{\textbf{Advisors:}}	&
@@ -176,8 +187,8 @@
 
 \doublespacing
 
-%\input{0_abstract}
-%\input{0_revision}
+\input{0_abstract}
+\input{0_revision}
 
 \doublespacing
 \tableofcontents
@@ -193,6 +204,9 @@
 \input{6_conclusions}
 \bibliography{state_of_art}
 \bibliographystyle{plain}
-%\input{annex}
+
+\begin{appendix}
+\input{annex}
+\end{appendix}
 
 \end{document}

@@ -1,19 +1,43 @@
 \chapter*{Abstract}
 
-This project attempts to enhance the features of a statistical parametric speech synthesis (SPSS) system based on long short-term memory recurrent neural networks (RNN-LSTM) in order to be able to perform better with an expressive corpus. We used the Blizzard Challenge \cite{blizzard} text-to-speech corpus to train the speech synthesis. This corpus was chosen because of its richness in expressive content.
+Speech synthesis is the task of generating speech using computers. Due to the limitations of classical techniques, these systems are normally not suitable for applications that would benefit from expressiveness in the speech, such as audiobook reading.
 
-The first part of of the project was to develop a baseline speech sythesizer from \cite{pascual2016deep}. This architecture is based on RNN-LSTMs where the inputs are a vector of linguistic features and the output are speech parameters that are fed to a vocoder (we used Ahocoder \cite{vocoder_ah} for this project) to reconstruct the waveform from the synthesized speech.
+In this project, we attempt to develop a text-to-speech speech synthesizer that is capable of reacting to the semantic content of the input text to produce expressive speech. The system is based on the Socrates text-to-speech framework developed in the VEU research lab at UPC and the Keras deep learning library.
 
-The second part of the project was to develop a sentiment analysis classifier based on convolutional neural networks (CNN), that predicts how good or bad a given sentence is. This classifier was trained with a dataset from the Stanford sentiment treebank \cite{socher2013recursive}, which consists of movie reviews.
+The first part of the project was to develop a baseline system based on RNN-LSTM that doesn't take into account the semantic content of the text. Once we had this baseline system working, the additions for the expressive speech were developed. Throughout the development, the Blizzard Challenge 2013 text-to-speech corpus, which contains audiobooks, was used to train the systems. This corpus was chosen because of its richness in expressive speech.
 
-To obtain the expressive features that would allow for expressive speech to be synthesized, another CNN was trained using the Blizzard corpus to adapt the domain of the sentiment analysis network to the one from the synthesized speech. In the end, we use the activations from one of the layers from the sentiment analysis network as expressive embeddings and use them as inputs for the speech synthesizer.
+To develop the expressive speech, we used text classification to predict the meaning of a given sentence, and used this information to improve the baseline system. This prediction is trained using a Stanford dataset with movie reviews. Because the type of text on this dataset is different from the Blizzard one, there is a domain adaptation that is performed to transfer information from the Blizzard corpus into the Stanford one.
 
-Various experiments have been carried out to find the set of expressive features that give the best objective and subjective results (including a baseline) by means of an evaluation done by TODO volunteers.
+Three experiments have been carried out to find the set of expressive features that give the best objective and subjective results by means of an evaluation done by nine volunteers. According to the objective metrics, the baseline system is the one that performs best with the Blizzard corpus, but the subjective evaluation shows some preference for the modified systems.
 
-%TODO results
+\chapter*{Resumen}
 
-%\chapter*{Resum}
+La sintesis de voz consiste en utilizar ordenadores para generar voz humana. Debido a las limitaciones de las técnicas clásicas, estos sitemas normalmente no son adecuados para aplicaciones que requieren voz expresiva como en la lectura automática de audiolibros.
 
-%\chapter*{Resumen}
+En este proyecto, tratamos de desarrollar un sintetizador de voz capaz de reaccionar al contenido semántico del texto para producir voz expresiva. El sistema está basado en el framework de síntesis de voz Socrates, desarrollado en el grupo VEU de la UPC, y en la librería de deep learning Keras.
+
+La primera parte del proyecto consiste en desarrollar un sistema base que no tiene en cuenta el contenido semántico, basado en redes neuronales recurrentes RNN-LSTM. Una vez finalizada esta parte, se continuó con el desarrollo de la síntesis expresiva. Durante el proyecto hemos usado la base de datos Blizzard Challenge 2013, la cual contiene una serie de audiolibros. Elegimos esta base de datos en particular por ser muy rica en expresividad de la voz.
+
+Para desarrollar la síntesis de voz expresiva, usamos procesado del lenguaje natural (PLN) para predecir el significado de las frases con un clasificador. Usamos esta informacion para mejorar el sistema anterior. Esta parte se hizo usando una base de datos llamada Stanford sentiment treebank, la cual contiene una serie de reseñas de cine. Debido a que esta base de datos contiene texto de distinta naturaleza del de Blizzard, hacemos una adaptación del dominio del clasificador.
+
+Se han realizado tres experimento para su posterior evaluación objetiva y subjetiva, la segunda preguntando a nueve personas voluntarias. Segun los resultados objetivos, el sistema base es el que tiene mejores resultados, pero segun los subjetivos, hay una preferencia por los experimentos expresivos.
+
+\chapter*{Resum}
+
+La síntesi de veu consisteix en fer servir ordinadors per generar veu humana. Degut a les limitacions de les tècniques clàssiques, aquests sistemes normalment no són adequats per aplicacions que requireixen veu expressiva com és el cas de la lectura de audiollibres automàtica.
+
+En aquest projecte, desenvolupem un sintetitzador de veu capaç de reaccionar al contingut semàntic del text per produir veu expressiva. El sistema està basat en el framework de síntesi de veu Socrates, desenvolupat al grup de recerca VEU de la UPC, i en la llibreria de deep learning Keras.
+
+La primera part del projecte consisteix en desenvolupar un sistema base que no tingui en compte el contingut semàntic del text, basat en xarxes neuronals recurrents RNN-LSTM. Finalitzada aquesta part, es va continuar amb el desenvolupament de la síntesi de veu expressiva. Durant aquest projecte hem fet servir la base de dades Blizzard Challenge 2013 per fer la síntesi, que conté audiollibres. Vam escollir aquesta base de dades en particular per la seva riquesa en veu expressiva.
+
+Per desenvolupar la síntesi de veu  expressiva, vam fer servir processat del llenguatge natural (PLN) per predir el significat de les frases amb un classificador. Vam fer servir aquesta informació per millorar el sistema anterior. En aquesta part, vam fer servir la base de dades Stanford sentiment treebank, que conté una serie de ressenyes de cinema. Degut a que el text d'aquesta base de dades es bastant diferent del Blizzard, semànticamente, es va fer una adaptació del classificador per poder fer-lo servir en la síntesi.
+
+S'han realitzat i evaluat tres experiments de síntesi i s'han valorar objectiva y subjectivamnt, aquesta segona preguntant a nou voluntaris. Els resultats objectius mostren que el sistema base és objectivament millor però els subjectius mostren una preferència pels experiments expressius.
+
+%{\it The engines don't move the ship at all. The ship stays where it is, and the engines move the universe around it.}
 
 \chapter*{Acknowledgements}
+
+First of all, I would like to thank my two project advisors for being so patient with me and enabling me to do this project. Without their support and ideas and all the resources that they provided me with, this project would've been impossible to finish.
+
+Secondly, thanks to the VEU research lab and the people in charge of the computing resources of the D5 building for giving me a place to work in their servers. And last but definitely not least, I would also like to thank everyone who so kindly participated in the subjective evaluation test.

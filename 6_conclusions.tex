@@ -1,1 +1,17 @@
 \chapter{Conclusions}
+
+In this project, a speech synthesizer has been developed using the Socrates framework and Keras deep learning library. All the work has been developed with the help of members of the VEU research lab at UPC.
+
+The used databases for training the systems were the Stanford sentiment treebank and the Blizzard challenge. The first one was already prepared for easy use but the second one had to be prepared to be used in the developed speech synthesizers. To perform this step, we used the Ogmios and Ramses software from the VEU research lab. We then used sentiment analysis to obtain expressive information about the training and test data.
+
+The total amount of speech data had to be cut down to 30\% of the total so this had an impact in the naturalness of the synthesized voice. But we stayed with this conditions because the goal of the project was to improve the expressiveness and not the clarity of the speech. In the end, the speech is still intelligible.
+
+To adapt the sentiment analysis task to the Blizzard corpus, an adaptation step was performed which in the end did not improve the objective metrics of the system. This could be because the followed strategy was not the appropriate one. This is a potential area where this project could potentially be improved in the future.
+
+Another thing to notice is that the Blizzard corpus contained several audiobooks, but we did not mix them in the train, test and validation sets. An improvement would involve using data from all the audiobooks in the train, test and validation data.
+
+A listening test was performed by nine volunteers who rated the synthesized voices from appropriate to not appropriate in a scale. This subjective evaluation shows some preference to the developed systems. We included speech with and without the adaptation step, but the one without it performed better.
+
+Regarding the initial work plan, a few modifications were made to simplify the system. Initially we had planned to perform the adaptation using a new model instead of reusing the one trained with the Stanford dataset. Also the preparation of the Blizzard corpus was delayed a few weeks from the original plan.
+
+The classical and modern techniques of speech synthesis have been reviewed as part of this project, as well as natural language processing techniques for text classification and sentiment analysis. I also could develop this project in a high-performant computational environment, something I normally don't have access to. I have deepen in statistical parametric speech theory and application, as well as natural language processing. As a side result, there is a new properly segmented corpus available to deepen in the topic of expressive speech synthesis in the future, and a web application that could be reused in the future to perform subjective evaluations.
